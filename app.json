@@ -1,17 +1,20 @@
 {
   "expo": {
-    "name": "aquasite-mobile",
+    "name": "AquaSite",
     "slug": "aquasite-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#020e1e",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "br.fieb.aquasite"
     },
     "android": {
+      "package": "br.fieb.aquasite",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#020e1e",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -20,6 +23,37 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O AquaSite usa suas fotos para você publicar imagens e trocar a foto de perfil.",
+          "cameraPermission": "O AquaSite usa a câmera para você tirar fotos para publicar."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O AquaSite usa sua localização só para achar a praia mais próxima e calcular a distância. Ela não é enviada ao servidor."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#020e1e",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#00d4ff",
+          "icon": "./assets/android-icon-monochrome.png"
+        }
+      ]
+    ]
   }
 }
