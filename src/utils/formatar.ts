@@ -9,6 +9,11 @@ export function tempoAtras(data: string | null | undefined): string {
   return `${Math.floor(diff / 86400)}d`
 }
 
+/** Quando o post foi publicado: "5min", "3h", "2d". Posts antigos (de antes da data completa) só têm a hora. */
+export function quandoPostou(post: { created_at?: string | null; time?: string | null }): string {
+  return post.created_at ? tempoAtras(post.created_at) : post.time ?? ''
+}
+
 /** Hora "14:05" de uma data ISO. */
 export function hora(data: string | null | undefined): string {
   if (!data) return ''

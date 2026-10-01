@@ -1,13 +1,17 @@
 import React, { memo, useState } from 'react'
-import { Pressable, Share, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { perguntar } from '../utils/perguntar'
 import Avatar from './Avatar'
 import Icone from './Icone'
 import ImagemAmpliavel from './ImagemAmpliavel'
 import ModalDenuncia from './ModalDenuncia'
+import FolhaCompartilhar from './FolhaCompartilhar'
+import TextoComLinks from './TextoComLinks'
 import type { Post } from '../types/api'
 import { cores, espaco, raio } from '../theme/tema'
-import { semArroba } from '../utils/formatar'
+import { quandoPostou, semArroba } from '../utils/formatar'
+import { alvos } from '../utils/compartilhar'
+import type { AlvoCompartilhar } from '../utils/compartilhar'
 
 interface Props {
   post: Post
@@ -18,10 +22,12 @@ interface Props {
   onAbrirPerfil?: (username: string) => void
   /** abre já com os comentários à mostra (tela de detalhe do post) */
   comentariosAbertos?: boolean
+  /** id do comentário que veio num link compartilhado (fica destacado) */
+  comentarioDestacado?: number
 }
 
 /** Um post do feed geral (mesmos dados e ações do site). */
-const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, comentariosAbertos: abertosDeInicio = false }: Props) => {
+const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, comentariosAbertos: abertosDeInicio = false, comentarioDestacado }: Props) => {
   const autor = semArroba(post.user)
   const meu = eu === autor
   const [comentariosAbertos, setComentariosAbertos] = useState(abertosDeInicio)
@@ -29,12 +35,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
   const [enviando, setEnviando] = useState(false)
   const [denunciar, setDenunciar] = useState(false)
 
-  const compartilhar = async () => {
-    const trecho = post.content.length > 140 ? `${post.content.slice(0, 140)}…` : post.content
-    try {
-      await Share.share({ message: `@${autor}${trecho ? `: ${trecho}` : ' publicou no AquaSite'}\n\nAquaSite — rede social sobre vida marinha` })
-    } catch { /* a pessoa fechou a janela */ }
-  }
+  const [compartilhar, setCompartilhar] = useState<AlvoCompartilhar | null>(null)
 
   const confirmarApagar = () => perguntar('Apagar post', 'Apagar este post? Não dá para desfazer.', [
     { text: 'Cancelar', style: 'cancel' },
@@ -56,7 +57,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
           <Avatar username={autor} tamanho={36} />
           <View>
             <Text style={estilos.nome}>@{autor}</Text>
-            <Text style={estilos.hora}>{post.time}</Text>
+            <Text style={estilos.hora}>{quandoPostou(post)}</Text>
           </View>
         </Pressable>
         {meu && onApagar ? (
@@ -73,7 +74,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
       {post.oculto && (
         <Text style={estilos.oculto}>Oculto do feed por denúncias, aguardando revisão de um administrador. Só você vê este post.</Text>
       )}
-      {!!post.content && <Text style={estilos.conteudo} selectable>{post.content}</Text>}
+      {!!post.content && <TextoComLinks texto={post.content} estilo={estilos.conteudo} />}
       {post.image && (
         <ImagemAmpliavel uri={post.image} descricao={`Foto publicada por @${autor}`} estilo={estilos.imagem} />
       )}
@@ -90,8 +91,8 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
           <Icone nome="message" tamanho={17} cor={cores.textoSuave} />
           <Text style={estilos.acaoTexto}>{post.comments.length}</Text>
         </Pressable>
-        <Pressable style={estilos.acao} onPress={compartilhar} accessibilityRole="button" accessibilityLabel="Compartilhar">
-          <Icone nome="arrow-right" tamanho={17} cor={cores.textoSuave} />
+        <Pressable style={estilos.acao} onPress={() => setCompartilhar(alvos.post(post))} accessibilityRole="button" accessibilityLabel="Compartilhar post">
+          <Icone nome="share" tamanho={17} cor={cores.textoSuave} />
           <Text style={estilos.acaoTexto}>Compartilhar</Text>
         </Pressable>
       </View>
@@ -100,9 +101,15 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
         <View style={estilos.comentarios}>
           {post.comments.length === 0 && <Text style={estilos.hora}>Nenhum comentário ainda.</Text>}
           {post.comments.map(c => (
-            <Text key={c.id} style={estilos.comentario}>
-              <Text style={estilos.nome} onPress={() => onAbrirPerfil?.(c.user)}>{c.user}: </Text>{c.text}
-            </Text>
+            <View key={c.id} style={[estilos.linhaComentario, c.id === comentarioDestacado && estilos.destacado]}>
+              <Text style={[estilos.comentario, { flex: 1 }]}>
+                <Text style={estilos.nome} onPress={() => onAbrirPerfil?.(c.user)}>{c.user}: </Text>{c.text}
+              </Text>
+              <Pressable onPress={() => setCompartilhar(alvos.comentario(post.id, c))} hitSlop={8}
+                accessibilityRole="button" accessibilityLabel={'Compartilhar comentário de ' + c.user}>
+                <Icone nome="share" tamanho={15} cor={cores.textoApagado} />
+              </Pressable>
+            </View>
           ))}
           {eu && onComentar && (
             <View style={estilos.novoComentario}>
@@ -118,6 +125,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
         </View>
       )}
 
+      {compartilhar && <FolhaCompartilhar alvo={compartilhar} aoFechar={() => setCompartilhar(null)} />}
       {denunciar && (
         <ModalDenuncia visivel={denunciar} aoFechar={() => setDenunciar(false)} alvo={{ tipo: 'post', postId: post.id }} />
       )}
@@ -146,6 +154,8 @@ const estilos = StyleSheet.create({
   acaoTexto: { color: cores.textoSuave, fontSize: 13, fontWeight: '600' },
   comentarios: { gap: espaco.sm, borderTopWidth: 1, borderTopColor: cores.borda, paddingTop: espaco.md },
   comentario: { color: cores.texto, fontSize: 14, lineHeight: 20 },
+  linhaComentario: { flexDirection: 'row', alignItems: 'flex-start', gap: espaco.sm, borderRadius: raio.sm, padding: 4 },
+  destacado: { backgroundColor: cores.destaqueFundo, borderWidth: 1, borderColor: cores.destaque },
   novoComentario: { flexDirection: 'row', gap: espaco.sm, alignItems: 'center' },
   inputComentario: {
     flex: 1, minHeight: 42, borderRadius: raio.pilula, borderWidth: 1, borderColor: cores.bordaForte,

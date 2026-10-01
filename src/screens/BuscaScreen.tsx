@@ -8,7 +8,7 @@ import { Aviso, Carregando, EstadoVazio } from '../components/Estados'
 import { useEu } from '../contexts/AuthContext'
 import { busca } from '../services/api'
 import { mensagemDeErro } from '../services/http'
-import { semArroba } from '../utils/formatar'
+import { quandoPostou, semArroba } from '../utils/formatar'
 import type { ResultadoBusca } from '../types/api'
 import type { RaizParams } from '../types/navegacao'
 import { base, cores, espaco, raio } from '../theme/tema'
@@ -72,7 +72,7 @@ const BuscaScreen = ({ navigation }: Props) => {
                 <Text style={estilos.nome} onPress={() => abrirPerfil(semArroba(p.user))}>{p.user}</Text>
                 <Text style={[base.texto, { marginTop: 6 }]}>{p.content}</Text>
                 {p.image && <ImagemAmpliavel uri={p.image} descricao={`Foto publicada por ${p.user}`} estilo={estilos.imagem} />}
-                <Text style={[base.textoSuave, { marginTop: 6 }]}>♥ {p.likes} · {p.time}</Text>
+                <Text style={[base.textoSuave, { marginTop: 6 }]}>♥ {p.likes} · {quandoPostou(p)}</Text>
               </View>
             ))}
           </>

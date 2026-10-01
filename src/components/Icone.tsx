@@ -216,6 +216,27 @@ const ICONES = {
     </>
   ),
   droplet: <Path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />,
+  share: (
+    <>
+      <Circle cx="18" cy="5" r="3" />
+      <Circle cx="6" cy="12" r="3" />
+      <Circle cx="18" cy="19" r="3" />
+      <Line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+      <Line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+    </>
+  ),
+  link: (
+    <>
+      <Path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <Path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+    </>
+  ),
+  copy: (
+    <>
+      <Rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <Path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </>
+  ),
   globe: (
     <>
       <Circle cx="12" cy="12" r="10" />
@@ -240,7 +261,7 @@ const ICONES = {
 
 export type NomeIcone = keyof typeof ICONES
 
-export const NOMES_ICONES = ["acessibilidade","heart","message","trash","camera","user","users","bell","mail","flag","pencil","save","x","check","alert","menu","arrow-left","arrow-right","chevron-up","chevron-down","file","fish","waves","thermometer","sun","moon","cloud","cloud-drizzle","cloud-rain","cloud-lightning","wind","map-pin","search","navigation","crosshair","sunrise","sunset","droplet","globe","lock","layers"] as const
+export const NOMES_ICONES = ["acessibilidade","heart","message","trash","camera","user","users","bell","mail","flag","pencil","save","x","check","alert","menu","arrow-left","arrow-right","chevron-up","chevron-down","file","fish","waves","thermometer","sun","moon","cloud","cloud-drizzle","cloud-rain","cloud-lightning","wind","map-pin","search","navigation","crosshair","sunrise","sunset","droplet","globe","lock","layers","share","link","copy"] as const
 
 interface Props {
   nome: NomeIcone

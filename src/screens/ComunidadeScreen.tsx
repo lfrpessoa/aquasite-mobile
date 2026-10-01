@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FlatList, Linking, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
@@ -10,11 +10,14 @@ import Campo from '../components/Campo'
 import Botao from '../components/Botao'
 import Avatar from '../components/Avatar'
 import Icone from '../components/Icone'
+import FolhaCompartilhar from '../components/FolhaCompartilhar'
 import { Aviso, Carregando, EstadoVazio } from '../components/Estados'
 import { useEu } from '../contexts/AuthContext'
 import { useCarregar } from '../hooks/useCarregar'
 import { comunidade as api } from '../services/api'
 import { mensagemDeErro } from '../services/http'
+import { alvos } from '../utils/compartilhar'
+import type { AlvoCompartilhar } from '../utils/compartilhar'
 import { STATUS_PEDIDO, TEMAS, localTexto, temaLabel } from '../data/conteudo'
 import type { Comunidade, Membro, MinhasSolicitacoes, Ong, TipoGrupo, Visibilidade } from '../types/api'
 import type { AbasParams, RaizParams } from '../types/navegacao'
@@ -25,7 +28,7 @@ type Aba = 'ongs' | 'comunidades'
 type Item = (Ong & { tipo: 'ong' }) | (Comunidade & { tipo: 'comunidade' })
 
 /** Página Comunidade: ONGs reais e comunidades criadas pelos usuários (mesmos dados do site). */
-const ComunidadeScreen = ({ navigation }: Props) => {
+const ComunidadeScreen = ({ navigation, route }: Props) => {
   const eu = useEu()
   const [aba, setAba] = useState<Aba>('ongs')
   const [filtro, setFiltro] = useState('')
@@ -54,6 +57,24 @@ const ComunidadeScreen = ({ navigation }: Props) => {
     ...(dados.dados?.minhas?.ongs ?? []).map(s => ({ ...s, tipo: 'ONG sugerida' })),
   ].filter(s => s.status !== 'aprovada')
 
+  // chegou por um link compartilhado (/comunidade?ver=ong-5): abre os detalhes quando as listas chegam
+  const abrir = route.params?.abrir
+  const [avisoLink, setAvisoLink] = useState<string | null>(null)
+  useEffect(() => {
+    if (!abrir || !dados.dados) return
+    navigation.setParams({ abrir: undefined })
+    setAba(abrir.tipo === 'ong' ? 'ongs' : 'comunidades')
+    const achado = abrir.tipo === 'ong'
+      ? dados.dados.ongs.find(o => o.id === abrir.id)
+      : dados.dados.comunidades.find(c => c.id === abrir.id)
+    if (achado) {
+      setAvisoLink(null)
+      setAberto({ ...achado, tipo: abrir.tipo } as Item)
+    } else {
+      setAvisoLink(abrir.tipo === 'ong' ? 'A ONG do link não foi encontrada.' : 'A comunidade do link não foi encontrada. Ela pode ter sido removida.')
+    }
+  }, [abrir, dados.dados, navigation])
+
   const atualizarItem = (novo: Item) => {
     setAberto(novo)
     dados.definir(d => d && (novo.tipo === 'ong'
@@ -77,6 +98,7 @@ const ComunidadeScreen = ({ navigation }: Props) => {
           ListHeaderComponent={(
             <View style={{ gap: espaco.md }}>
               <Aviso tipo="erro" texto={dados.erro} />
+              <Aviso tipo="atencao" texto={avisoLink} />
               <View style={estilos.busca}>
                 <Icone nome="search" tamanho={16} cor={cores.textoApagado} />
                 <TextInput value={filtro} onChangeText={setFiltro} placeholder={aba === 'ongs' ? 'Pesquisar ONGs' : 'Pesquisar comunidades'}
@@ -141,6 +163,7 @@ const DetalheGrupo = ({ item, eu, aoFechar, aoMudar, aoAbrirFeed, aoAbrirPerfil 
   item: Item; eu: string; aoFechar: () => void; aoMudar: (i: Item) => void
   aoAbrirFeed: (i: Item) => void; aoAbrirPerfil: (u: string) => void
 }) => {
+  const [compartilhar, setCompartilhar] = useState<AlvoCompartilhar | null>(null)
   const tipo: TipoGrupo = item.tipo
   const souAdmin = item.tipo === 'comunidade' && !!item.souAdmin
   const membros = useCarregar<Membro[]>(() => api.membros(tipo, item.id), [item.id, item.membros])
@@ -198,7 +221,9 @@ const DetalheGrupo = ({ item, eu, aoFechar, aoMudar, aoAbrirFeed, aoAbrirPerfil 
       <View style={estilos.botoes}>
         {!souAdmin && <Botao titulo={textoParticipar} pequeno variante={item.participando ? 'perigo' : 'primario'} onPress={participar} carregando={ocupado} />}
         {podeVerFeed && <Botao titulo="Abrir feed" icone="message" pequeno variante="secundario" onPress={() => aoAbrirFeed(item)} />}
+        <Botao titulo="Compartilhar" icone="share" pequeno variante="secundario" onPress={() => setCompartilhar(alvos.grupo(item.tipo, item))} />
       </View>
+      {compartilhar && <FolhaCompartilhar alvo={compartilhar} aoFechar={() => setCompartilhar(null)} />}
       {item.tipo === 'ong' && <Text style={base.textoSuave}>Participar é um apoio dentro do AquaSite. Voluntariado e doações são feitos pelo site da ONG.</Text>}
 
       {souAdmin && (

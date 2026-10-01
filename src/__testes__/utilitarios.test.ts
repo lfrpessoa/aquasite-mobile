@@ -1,5 +1,5 @@
 import { forcaDaSenha } from '../utils/senha'
-import { diaSemana, duracao, numero, semArroba, tempoAtras } from '../utils/formatar'
+import { diaSemana, duracao, numero, quandoPostou, semArroba, tempoAtras } from '../utils/formatar'
 import { PRAIAS, condicaoPorCodigo, distanciaKm, estadoDoMar, nivelUV, pontoCardeal, praiaMaisProxima } from '../utils/praias'
 import { calcularConquistas, temaLabel } from '../data/conteudo'
 import { ANIMAIS, GRUPOS } from '../data/animais'
@@ -87,5 +87,16 @@ describe('conteúdo fixo', () => {
     expect(ANIMAIS.every(a => GRUPOS.includes(a.grupo))).toBe(true)
     expect(new Set(ANIMAIS.map(a => a.nome)).size).toBe(35)
     expect(ANIMAIS.find(a => a.nome === 'Raia-Manta')?.grupo).toBe('Peixe')
+  })
+})
+
+describe('hora do post', () => {
+  it('post novo mostra há quanto tempo foi publicado', () => {
+    const haDuasHoras = new Date(Date.now() - 2 * 3600_000 - 60_000)
+    const iso = new Date(haDuasHoras.getTime() - haDuasHoras.getTimezoneOffset() * 60_000).toISOString().slice(0, 19) // hora local, sem fuso (como a API manda)
+    expect(quandoPostou({ created_at: iso, time: '09:00' })).toBe('2h')
+  })
+  it('post antigo, sem data completa, mostra a hora', () => {
+    expect(quandoPostou({ created_at: null, time: '17:10' })).toBe('17:10')
   })
 })

@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Icone from '../components/Icone'
 import ImagemAmpliavel from '../components/ImagemAmpliavel'
+import TextoComLinks from '../components/TextoComLinks'
 import { Aviso, Carregando } from '../components/Estados'
 import { useEu } from '../contexts/AuthContext'
 import { useCarregar } from '../hooks/useCarregar'
@@ -102,7 +103,7 @@ const ChatScreen = ({ route, navigation }: Props) => {
           ) : (
             <>
               {m.image && <ImagemAmpliavel uri={m.image} descricao={`Imagem enviada por @${m.sender}`} estilo={estilos.imagem} />}
-              {!!m.content && <Text style={[estilos.texto, minha && { color: '#fff' }]} selectable>{m.content}</Text>}
+              {!!m.content && <TextoComLinks texto={m.content} estilo={[estilos.texto, minha && { color: '#fff' }]} noMeuBalao={minha} />}
             </>
           )}
           <Text style={[estilos.hora, minha && { color: 'rgba(255,255,255,0.75)' }]}>{quando}</Text>

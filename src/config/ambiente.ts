@@ -18,3 +18,9 @@ export const HEARTBEAT_MS = 25_000
 
 /** Posts por página no feed (igual ao "Carregar mais" do site). */
 export const POSTS_POR_PAGINA = 20
+
+/**
+ * Endereço do SITE do AquaSite. Os links de compartilhar (post, comentário, comunidade) apontam para ele,
+ * para abrirem em qualquer navegador; dentro do app, links desse endereço abrem a tela certa.
+ */
+export const SITE_URL: string = (process.env.EXPO_PUBLIC_SITE_URL || 'https://aquasite-frontend-aquasite-react.vercel.app').replace(/\/+$/, '')

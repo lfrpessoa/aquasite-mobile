@@ -15,10 +15,11 @@ type Props = NativeStackScreenProps<RaizParams, 'Post'>
 
 /**
  * Um post só (GET /api/posts/{id}), com curtidas e comentários abertos.
- * É aberto ao tocar numa notificação de curtida, comentário ou moderação, ou num aviso push.
+ * É aberto ao tocar numa notificação de curtida, comentário ou moderação, num aviso push
+ * ou num link compartilhado (/post/12?comentario=40 destaca o comentário).
  */
 const PostScreen = ({ route, navigation }: Props) => {
-  const { id } = route.params
+  const { id, comentarioId } = route.params
   const eu = useEu()
   const post = useCarregar<Post>(() => feed.obter(id), [id])
   const [erro, setErro] = useState<string | null>(null)
@@ -73,7 +74,7 @@ const PostScreen = ({ route, navigation }: Props) => {
           {post.dados.oculto && (
             <Aviso tipo="atencao" texto="Este post está oculto do feed por denúncias até a revisão de um administrador." />
           )}
-          <PostCard post={post.dados} eu={eu.username} comentariosAbertos
+          <PostCard post={post.dados} eu={eu.username} comentariosAbertos comentarioDestacado={comentarioId}
             onCurtir={p => void curtir(p)} onComentar={comentar} onApagar={p => void apagar(p)}
             onAbrirPerfil={u => (u === eu.username ? navigation.navigate('Abas', { screen: 'Perfil' }) : navigation.navigate('Usuario', { username: u }))} />
         </>

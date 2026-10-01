@@ -6,7 +6,8 @@ export type AbasParams = {
   Feed: undefined
   Mapa: undefined
   Especies: undefined
-  Comunidade: undefined
+  /** abrir = veio de um link compartilhado: abre os detalhes dessa ONG/comunidade */
+  Comunidade: { abrir?: { tipo: TipoGrupo; id: number } } | undefined
   Mensagens: undefined
   Perfil: undefined
 }
@@ -19,10 +20,12 @@ export type RaizParams = {
   Abas: NavigatorScreenParams<AbasParams> | undefined
   Usuario: { username: string }
   Chat: { username: string }
-  Post: { id: number }
+  /** comentarioId = veio do link de um comentário: ele fica destacado */
+  Post: { id: number; comentarioId?: number }
   Notificacoes: undefined
   Busca: undefined
-  FeedComunidade: { tipo: TipoGrupo; id: number; nome: string }
+  /** nome falta quando a tela é aberta por um link; postId/comentarioId = post e comentário do link */
+  FeedComunidade: { tipo: TipoGrupo; id: number; nome?: string; postId?: number; comentarioId?: number }
   Admin: undefined
   // abertas para todos
   MapaVisitante: undefined

@@ -66,7 +66,10 @@ export interface Post {
   image: string | null
   likes: number
   curtiu?: boolean
+  /** só a hora ("14:05"); use quandoPostou() para mostrar */
   time: string
+  /** data e hora completas (posts antigos não têm) */
+  created_at?: string | null
   oculto?: boolean
   comments: ComentarioPost[]
 }
