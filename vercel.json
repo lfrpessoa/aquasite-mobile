@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx expo export -p web",
+  "buildCommand": "EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL:-https://aquasite-server-1.onrender.com} npx expo export -p web",
   "outputDirectory": "dist",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
