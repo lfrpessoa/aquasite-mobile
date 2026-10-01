@@ -22,8 +22,6 @@ export interface UsuarioSessao {
 export interface RespostaLogin extends RespostaSimples {
   token?: string
   user?: UsuarioSessao
-  /** true quando a pessoa entrou com uma senha temporária gerada pelo admin */
-  trocarSenha?: boolean
 }
 
 export interface Sessao {
@@ -153,6 +151,20 @@ export interface AvisoPraia {
   usuario: string
   status: string
   created_at: string
+  /** URL da foto tirada no local (ou null) */
+  foto?: string | null
+  latitude?: number | null
+  longitude?: number | null
+}
+
+export interface NovoAvisoPraia {
+  praia: string
+  uf?: string
+  categoria: CategoriaAviso
+  descricao: string
+  foto?: string | null
+  latitude?: number | null
+  longitude?: number | null
 }
 
 // ---------- Denúncias ----------
@@ -350,6 +362,3 @@ export interface AdminDenuncia {
   created_at: string | null
 }
 
-export interface RespostaSenhaTemporaria extends RespostaSimples {
-  senhaTemporaria?: string
-}

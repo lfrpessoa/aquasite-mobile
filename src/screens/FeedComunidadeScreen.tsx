@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
+import { perguntar } from '../utils/perguntar'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Avatar from '../components/Avatar'
 import Icone from '../components/Icone'
@@ -67,7 +68,7 @@ const FeedComunidadeScreen = ({ route, navigation }: Props) => {
     } catch (e) { setErro(mensagemDeErro(e)); return false }
   }
 
-  const apagarPost = (p: PostComunidade) => Alert.alert('Apagar post', p.autor === eu.username ? 'Apagar seu post?' : `Apagar o post de @${p.autor}?`, [
+  const apagarPost = (p: PostComunidade) => perguntar('Apagar post', p.autor === eu.username ? 'Apagar seu post?' : `Apagar o post de @${p.autor}?`, [
     { text: 'Cancelar', style: 'cancel' },
     { text: 'Apagar', style: 'destructive', onPress: () => {
       api.apagarPost(p.id).then(r => (r.success ? definirPost(p.id, () => null) : setErro(r.error ?? 'Não foi possível apagar.')))

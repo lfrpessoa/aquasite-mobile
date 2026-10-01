@@ -53,7 +53,8 @@
           "color": "#00d4ff",
           "icon": "./assets/android-icon-monochrome.png"
         }
-      ]
+      ],
+      "expo-image"
     ]
   }
 }

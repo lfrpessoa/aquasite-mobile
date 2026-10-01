@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Alert, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { perguntar } from '../utils/perguntar'
 import Chips from '../components/Chips'
 import Folha from '../components/Folha'
 import Campo from '../components/Campo'
@@ -65,43 +66,29 @@ function Lista<T>({ dados, erroExtra, vazio, children }: {
 }
 
 const confirmar = (titulo: string, texto: string, acao: () => void, botao = 'Confirmar') =>
-  Alert.alert(titulo, texto, [{ text: 'Cancelar', style: 'cancel' }, { text: botao, style: 'destructive', onPress: acao }])
+  perguntar(titulo, texto, [{ text: 'Cancelar', style: 'cancel' }, { text: botao, style: 'destructive', onPress: acao }])
 
 const AbaUsuarios = () => {
   const dados = useCarregar<AdminUsuario[]>(admin.usuarios, [])
   const [erro, setErro] = useState<string | null>(null)
-  const [senha, setSenha] = useState<{ username: string; senha: string } | null>(null)
 
-  const excluir = (u: string) => confirmar('Excluir usuário', `Excluir @${u} e tudo o que é dele?`, () => {
+  const excluir = (u: string) => confirmar('Excluir usuário', `Excluir @${u} e tudo o que é dele? Comunidades que ele criou passam para o membro mais antigo (ou são apagadas, se não tiverem membros).`, () => {
     admin.excluirUsuario(u).then(r => (r.success ? dados.recarregar(true) : setErro(r.error ?? 'Não foi possível excluir.')))
       .catch(e => setErro(mensagemDeErro(e)))
   }, 'Excluir')
 
-  const gerarSenha = (u: string) => confirmar('Senha temporária', `Gerar uma senha temporária para @${u}? A senha atual deixa de funcionar.`, () => {
-    admin.senhaTemporaria(u).then(r => (r.success && r.senhaTemporaria ? setSenha({ username: u, senha: r.senhaTemporaria })
-      : setErro(r.error ?? 'Não foi possível gerar.'))).catch(e => setErro(mensagemDeErro(e)))
-  }, 'Gerar')
-
   return (
-    <>
-      <Lista dados={dados} erroExtra={erro} vazio="Nenhum usuário.">
-        {itens => itens.map(u => (
-          <View key={u.id} style={estilos.item}>
-            <Text style={estilos.titulo}>@{u.username} {u.role === 'ADMIN' && <Text style={estilos.admin}>ADMIN</Text>}</Text>
-            <Text style={base.textoSuave}>{u.email}</Text>
-            <View style={estilos.acoes}>
-              <Botao titulo="Senha temporária" pequeno variante="secundario" icone="lock" onPress={() => gerarSenha(u.username)} />
-              <Botao titulo="Excluir" pequeno variante="perigo" onPress={() => excluir(u.username)} />
-            </View>
+    <Lista dados={dados} erroExtra={erro} vazio="Nenhum usuário.">
+      {itens => itens.map(u => (
+        <View key={u.id} style={estilos.item}>
+          <Text style={estilos.titulo}>@{u.username} {u.role === 'ADMIN' && <Text style={estilos.admin}>ADMIN</Text>}</Text>
+          <Text style={base.textoSuave}>{u.email}</Text>
+          <View style={estilos.acoes}>
+            <Botao titulo="Excluir" pequeno variante="perigo" onPress={() => excluir(u.username)} />
           </View>
-        ))}
-      </Lista>
-      <Folha visivel={senha !== null} titulo="Senha temporária" aoFechar={() => setSenha(null)}>
-        <Text style={base.texto}>Senha de <Text style={{ fontWeight: '700' }}>@{senha?.username}</Text>:</Text>
-        <Text style={estilos.senha} selectable>{senha?.senha}</Text>
-        <Text style={base.textoSuave}>Passe essa senha para a pessoa. Ao entrar, o site ou o app pede para ela escolher uma nova.</Text>
-      </Folha>
-    </>
+        </View>
+      ))}
+    </Lista>
   )
 }
 
@@ -302,7 +289,6 @@ const estilos = StyleSheet.create({
   admin: { color: cores.destaque, fontSize: 12 },
   linha: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: espaco.sm },
   acoes: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.sm, marginTop: 4 },
-  senha: { color: cores.destaque, fontSize: 26, fontWeight: '800', letterSpacing: 2, textAlign: 'center', paddingVertical: espaco.md },
 })
 
 export default AdminScreen

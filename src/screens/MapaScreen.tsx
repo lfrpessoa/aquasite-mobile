@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Image, Linking, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MapaPraias from '../components/MapaPraias'
 import CondicoesPraia from '../components/CondicoesPraia'
@@ -7,6 +7,7 @@ import Chips from '../components/Chips'
 import Campo from '../components/Campo'
 import Botao from '../components/Botao'
 import Icone from '../components/Icone'
+import ImagemAmpliavel from '../components/ImagemAmpliavel'
 import { Aviso } from '../components/Estados'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocalizacao } from '../hooks/useLocalizacao'
@@ -17,6 +18,7 @@ import { mensagemDeErro } from '../services/http'
 import { CATEGORIAS, PRAIAS, categoriaInfo, praiaMaisProxima } from '../utils/praias'
 import type { Local } from '../utils/praias'
 import { duracao, tempoAtras } from '../utils/formatar'
+import { escolherImagem } from '../utils/imagem'
 import type { AvisoPraia, CategoriaAviso } from '../types/api'
 import { base, cores, espaco, raio } from '../theme/tema'
 
@@ -37,15 +39,6 @@ const MapaScreen = () => {
   const [buscando, setBuscando] = useState(false)
   const pedido = useRef(0)
   const abriuPerto = useRef(false)
-
-  // com a localização, abre sozinho a praia mais próxima (como o site)
-  useEffect(() => {
-    if (eu && !abriuPerto.current && !sel) {
-      abriuPerto.current = true
-      void selecionar(praiaMaisProxima(eu.lat, eu.lon).praia)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eu?.lat, eu?.lon])
 
   const carregarAvisos = (nome: string) => {
     apiPraias.avisos(nome).then(l => setAvisos(Array.isArray(l) ? l : [])).catch(() => setAvisos([]))
@@ -70,6 +63,15 @@ const MapaScreen = () => {
       if (id === pedido.current) setDados({ estado: 'erro' })
     }
   }
+
+  // com a localização, abre sozinho a praia mais próxima (como o site)
+  useEffect(() => {
+    if (eu && !abriuPerto.current && !sel) {
+      abriuPerto.current = true
+      void selecionar(praiaMaisProxima(eu.lat, eu.lon).praia)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só quando a localização chega
+  }, [eu?.lat, eu?.lon])
 
   const tocarPonto = async (lat: number, lon: number) => {
     const provisorio: Local = { nome: 'Ponto no mapa', cidade: '', uf: '', lat, lon }
@@ -120,7 +122,7 @@ const MapaScreen = () => {
               </Pressable>
             ))}
             {resultados?.length === 0 && <Text style={base.textoSuave}>Nada encontrado.</Text>}
-            {!resultados && <Text style={base.textoSuave}>Toque em "buscar" no teclado para procurar em todo o Brasil</Text>}
+            {!resultados && <Text style={base.textoSuave}>Toque em “buscar” no teclado para procurar em todo o Brasil</Text>}
           </View>
         )}
 
@@ -151,7 +153,7 @@ const MapaScreen = () => {
             {dados?.estado === 'carregando' && <ActivityIndicator color={cores.destaque} style={{ margin: 20 }} />}
             {dados?.estado === 'erro' && <Aviso tipo="erro" texto="Não foi possível carregar as condições agora. Tente de novo em instantes." />}
             {dados?.estado === 'ok' && <CondicoesPraia dados={dados.cond} />}
-            <AvisosComunidade praia={sel} avisos={avisos} logado={!!usuario} aoEnviar={() => carregarAvisos(sel.nome)} />
+            <AvisosComunidade praia={sel} avisos={avisos} logado={!!usuario} minhaPosicao={eu} aoEnviar={() => carregarAvisos(sel.nome)} />
           </View>
         )}
       </ScrollView>
@@ -159,20 +161,40 @@ const MapaScreen = () => {
   )
 }
 
-/** "O que está acontecendo lá": avisos que a comunidade manda sobre a praia. */
-const AvisosComunidade = ({ praia, avisos, logado, aoEnviar }: { praia: Local; avisos: AvisoPraia[]; logado: boolean; aoEnviar: () => void }) => {
+/** Abre o ponto do aviso no app de mapas do celular (ou no navegador). */
+const abrirLocal = (lat: number, lon: number) =>
+  void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`)
+
+/**
+ * "O que está acontecendo lá": avisos que a comunidade manda sobre a praia.
+ * No celular dá para anexar uma foto tirada na hora e a posição do GPS (opcionais).
+ */
+const AvisosComunidade = ({ praia, avisos, logado, minhaPosicao, aoEnviar }: {
+  praia: Local; avisos: AvisoPraia[]; logado: boolean; minhaPosicao: { lat: number; lon: number } | null; aoEnviar: () => void
+}) => {
   const [categoria, setCategoria] = useState<CategoriaAviso>('poluicao')
   const [descricao, setDescricao] = useState('')
+  const [foto, setFoto] = useState<string | null>(null)
+  const [enviarLocal, setEnviarLocal] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+
+  const anexarFoto = async (origem: 'camera' | 'galeria') => {
+    setErro(null)
+    try {
+      const f = await escolherImagem(origem)
+      if (f) setFoto(f)
+    } catch (e) { setErro(mensagemDeErro(e)) }
+  }
 
   const enviar = async () => {
     if (!descricao.trim()) { setErro('Descreva o que está acontecendo.'); return }
     setEnviando(true)
     setErro(null)
     try {
-      const r = await apiPraias.avisar({ praia: praia.nome, uf: praia.uf, categoria, descricao: descricao.trim() })
-      if (r.success) { setDescricao(''); aoEnviar() } else setErro(r.error ?? 'Não foi possível enviar.')
+      const local = enviarLocal && minhaPosicao ? { latitude: minhaPosicao.lat, longitude: minhaPosicao.lon } : {}
+      const r = await apiPraias.avisar({ praia: praia.nome, uf: praia.uf, categoria, descricao: descricao.trim(), foto, ...local })
+      if (r.success) { setDescricao(''); setFoto(null); setEnviarLocal(false); aoEnviar() } else setErro(r.error ?? 'Não foi possível enviar.')
     } catch (e) { setErro(mensagemDeErro(e)) }
     setEnviando(false)
   }
@@ -192,6 +214,14 @@ const AvisosComunidade = ({ praia, avisos, logado, aoEnviar }: { praia: Local; a
               <Text style={base.textoSuave}>{tempoAtras(a.created_at)}</Text>
             </View>
             <Text style={base.texto}>{a.descricao}</Text>
+            {!!a.foto && <ImagemAmpliavel uri={a.foto} descricao={`Foto do aviso de @${a.usuario}`} estilo={estilos.avisoFoto} />}
+            {a.latitude != null && a.longitude != null && (
+              <Pressable onPress={() => abrirLocal(a.latitude as number, a.longitude as number)} style={estilos.avisoLocal}
+                accessibilityRole="link" accessibilityLabel="Ver no mapa o local de onde o aviso foi enviado">
+                <Icone nome="map-pin" tamanho={13} cor={cores.destaque} />
+                <Text style={estilos.avisoLocalTexto}>Ver o local do aviso</Text>
+              </Pressable>
+            )}
             <Text style={base.textoSuave}>@{a.usuario}</Text>
           </View>
         )
@@ -200,6 +230,28 @@ const AvisosComunidade = ({ praia, avisos, logado, aoEnviar }: { praia: Local; a
         <View style={{ gap: espaco.sm, marginTop: espaco.md }}>
           <Chips opcoes={CATEGORIAS.map(c => ({ valor: c.valor, label: c.label }))} valor={categoria} aoMudar={setCategoria} rotulo="Categoria do aviso" />
           <Campo value={descricao} onChangeText={setDescricao} placeholder="O que você está vendo na praia agora?" multiline maxLength={500} />
+          {foto ? (
+            <View style={estilos.previa}>
+              <Image source={{ uri: foto }} style={estilos.previaImg} accessibilityLabel="Foto que vai junto com o aviso" />
+              <Botao titulo="Remover foto" icone="x" pequeno variante="texto" onPress={() => setFoto(null)} rotuloAcessivel="Remover a foto do aviso" />
+            </View>
+          ) : (
+            <View style={estilos.acoes}>
+              {Platform.OS !== 'web' && <Botao titulo="Tirar foto" icone="camera" pequeno variante="secundario" onPress={() => void anexarFoto('camera')} />}
+              <Botao titulo="Foto da galeria" icone="camera" pequeno variante="texto" onPress={() => void anexarFoto('galeria')} />
+            </View>
+          )}
+          <View style={estilos.opcaoLocal}>
+            <View style={{ flex: 1 }}>
+              <Text style={base.texto}>Enviar minha localização</Text>
+              <Text style={base.textoSuave}>
+                {minhaPosicao ? 'Quem ler o aviso vê o ponto de onde você mandou.' : 'Permita o acesso à localização para usar.'}
+              </Text>
+            </View>
+            <Switch value={enviarLocal && !!minhaPosicao} onValueChange={setEnviarLocal} disabled={!minhaPosicao}
+              accessibilityLabel="Enviar minha localização junto com o aviso"
+              trackColor={{ true: cores.destaque, false: cores.bordaForte }} thumbColor={cores.branco} />
+          </View>
           <Aviso tipo="erro" texto={erro} />
           <Botao titulo="Avisar a comunidade" icone="alert" onPress={enviar} carregando={enviando} />
         </View>
@@ -226,6 +278,12 @@ const estilos = StyleSheet.create({
   acoes: { flexDirection: 'row', gap: espaco.sm, marginTop: espaco.sm },
   aviso: { borderTopWidth: 1, borderTopColor: cores.borda, paddingVertical: espaco.sm, gap: 3 },
   avisoTopo: { flexDirection: 'row', justifyContent: 'space-between' },
+  avisoFoto: { width: '100%', height: 160, borderRadius: raio.md, marginTop: 4 },
+  avisoLocal: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 32 },
+  avisoLocalTexto: { color: cores.destaque, fontSize: 13, fontWeight: '600' },
+  previa: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
+  previaImg: { width: 72, height: 72, borderRadius: raio.sm },
+  opcaoLocal: { flexDirection: 'row', alignItems: 'center', gap: espaco.md },
 })
 
 export default MapaScreen

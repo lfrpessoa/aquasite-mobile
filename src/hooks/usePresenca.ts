@@ -17,7 +17,7 @@ export function usePresenca(username: string | null): Presenca {
   const [naoLidas, setNaoLidas] = useState(0)
 
   useEffect(() => {
-    if (!username) { setNaoLidas(0); return }
+    if (!username) return
     let ativo = AppState.currentState !== 'background'
     const tique = () => {
       if (!ativo) return
@@ -37,5 +37,6 @@ export function usePresenca(username: string | null): Presenca {
   }, [username])
 
   const zerarNaoLidas = useCallback(() => setNaoLidas(0), [])
-  return { naoLidas, zerarNaoLidas }
+  // sem login não há notificações (e o número da conta anterior não aparece)
+  return { naoLidas: username ? naoLidas : 0, zerarNaoLidas }
 }

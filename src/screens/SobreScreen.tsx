@@ -1,9 +1,8 @@
 import React from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import Avatar from '../components/Avatar'
-import { EQUIPE } from '../data/conteudo'
+import { DICAS, EQUIPE } from '../data/conteudo'
 import { PRAIAS } from '../utils/praias'
-import { DICAS } from '../data/conteudo'
 import { ANIMAIS } from '../data/animais'
 import { base, cores, espaco, raio } from '../theme/tema'
 

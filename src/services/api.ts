@@ -2,14 +2,14 @@
  * Todas as chamadas à API do AquaSite usadas pelo app — os MESMOS endpoints que o site usa.
  * Nenhuma regra de negócio fica aqui: validações, permissões e contagens são feitas pelo backend.
  */
-import { requisitar } from './http'
+import { ErroApi, requisitar } from './http'
 import { POSTS_POR_PAGINA } from '../config/ambiente'
 import type {
-  AdminAvisoPraia, AdminDenuncia, AdminPost, AdminUsuario, AvisoPraia, CategoriaAviso, Comunidade,
+  AdminAvisoPraia, AdminDenuncia, AdminPost, AdminUsuario, AvisoPraia, Comunidade, NovoAvisoPraia,
   Conversa, EscopoApagar, Especie, FeedComunidade, Membro, Mensagem, MinhasSolicitacoes, NovaComunidade,
   NovaDenuncia, NovaEspecie, NovaOng, Notificacao, Ong, PerfilStats, PessoaLista, Post, RespostaComentarioComunidade,
   RespostaCurtida, RespostaCurtidaComunidade, RespostaDenuncia, RespostaLogin, RespostaParticipar, RespostaPedidos,
-  RespostaSenhaTemporaria, RespostaSimples, RespostaVisibilidade, ResultadoBusca, StatusDenuncia, StatusPedido,
+  RespostaSimples, RespostaVisibilidade, ResultadoBusca, StatusDenuncia, StatusPedido,
   TipoGrupo, Visibilidade, ComentarioPost,
 } from '../types/api'
 
@@ -60,6 +60,13 @@ export const feed = {
     requisitar<Post[]>(`/api/posts?limite=${POSTS_POR_PAGINA}${antesDe ? `&antesDe=${antesDe}` : ''}`),
   publicar: (content: string, image: string | null) =>
     requisitar<Post & RespostaSimples>('/api/posts', { metodo: 'POST', corpo: { content, image } }),
+  /** Um post só (tela de detalhe, aberta pelas notificações e pelo push). */
+  obter: async (id: number): Promise<Post> => {
+    const r = await requisitar<Post | RespostaSimples>(`/api/posts/${id}`)
+    // a API responde 404 com { success: false } quando o post foi apagado (ou está oculto para quem vê)
+    if ('success' in r && r.success === false) throw new ErroApi(r.error ?? 'Post não encontrado.', 404)
+    return r as Post
+  },
   curtir: (id: number) => requisitar<RespostaCurtida>(`/api/posts/${id}/like`, { metodo: 'POST' }),
   descurtir: (id: number) => requisitar<RespostaCurtida>(`/api/posts/${id}/like`, { metodo: 'DELETE' }),
   comentar: (id: number, text: string) =>
@@ -99,7 +106,8 @@ export const notificacoes = {
 
 export const praias = {
   avisos: (praia: string) => requisitar<AvisoPraia[]>(`/api/beach-reports?praia=${u(praia)}`, { autenticar: false }),
-  avisar: (dados: { praia: string; uf?: string; categoria: CategoriaAviso; descricao: string }) =>
+  /** foto (data URL) e latitude/longitude são opcionais */
+  avisar: (dados: NovoAvisoPraia) =>
     requisitar<RespostaSimples>('/api/beach-reports', { metodo: 'POST', corpo: dados }),
 }
 
@@ -158,8 +166,6 @@ export const admin = {
   usuarios: () => requisitar<AdminUsuario[]>('/api/admin/usuarios'),
   excluirUsuario: (username: string) =>
     requisitar<RespostaSimples>(`/api/admin/usuarios/${u(username)}`, { metodo: 'DELETE' }),
-  senhaTemporaria: (username: string) =>
-    requisitar<RespostaSenhaTemporaria>(`/api/admin/usuarios/${u(username)}/senha-temporaria`, { metodo: 'POST' }),
 
   posts: () => requisitar<AdminPost[]>('/api/admin/posts'),
   excluirPost: (id: number) => requisitar<RespostaSimples>(`/api/admin/posts/${id}`, { metodo: 'DELETE' }),

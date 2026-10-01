@@ -10,6 +10,18 @@ import { salvarPreferencias } from '../theme/preferencias'
 import { mensagemDeErro } from '../services/http'
 import { base, cores, espaco } from '../theme/tema'
 
+/** Uma opção liga/desliga com título e explicação. */
+const Opcao = ({ rotulo, dica, valor, aoMudar }: { rotulo: string; dica: string; valor: boolean; aoMudar: (v: boolean) => void }) => (
+  <View style={estilos.opcao}>
+    <View style={{ flex: 1 }}>
+      <Text style={base.texto}>{rotulo}</Text>
+      <Text style={base.textoSuave}>{dica}</Text>
+    </View>
+    <Switch value={valor} onValueChange={aoMudar} accessibilityLabel={rotulo}
+      trackColor={{ true: cores.destaque, false: cores.bordaForte }} thumbColor={cores.branco} />
+  </View>
+)
+
 /**
  * Aparência e acessibilidade (como o modo acessível do site): tema claro ou escuro, alto contraste
  * e menos animações. O tamanho das letras segue o do celular (Configurações > Tela > Tamanho da fonte).
@@ -25,17 +37,6 @@ const Aparencia = ({ visivel, aoFechar }: { visivel: boolean; aoFechar: () => vo
     setSalvando(true)
     try { await salvarPreferencias(escolha) } catch (e) { setErro(mensagemDeErro(e)); setSalvando(false) }
   }
-
-  const Opcao = ({ rotulo, dica, valor, aoMudar }: { rotulo: string; dica: string; valor: boolean; aoMudar: (v: boolean) => void }) => (
-    <View style={estilos.opcao}>
-      <View style={{ flex: 1 }}>
-        <Text style={base.texto}>{rotulo}</Text>
-        <Text style={base.textoSuave}>{dica}</Text>
-      </View>
-      <Switch value={valor} onValueChange={aoMudar} accessibilityLabel={rotulo}
-        trackColor={{ true: cores.destaque, false: cores.bordaForte }} thumbColor={cores.branco} />
-    </View>
-  )
 
   return (
     <Folha visivel={visivel} titulo="Aparência e acessibilidade" aoFechar={aoFechar}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import type { GestureResponderEvent, LayoutChangeEvent } from 'react-native'
 import Icone from './Icone'
@@ -36,12 +36,16 @@ const MapaPraias = ({ praias, selecionada, eu, aoTocarPraia, aoTocarPonto }: Pro
   const [centro, setCentro] = useState({ lat: -15.5, lon: -47 })
   const [zoom, setZoom] = useState(ZOOM_BRASIL)
 
-  // escolheu uma praia (na lista, na busca ou tocando no mapa): centraliza nela
-  useEffect(() => {
-    if (!selecionada) return
-    setCentro({ lat: selecionada.lat, lon: selecionada.lon })
-    setZoom(z => Math.max(z, ZOOM_PRAIA))
-  }, [selecionada])
+  // escolheu uma praia (na lista, na busca ou tocando no mapa): centraliza nela.
+  // Ajuste feito durante a renderização (padrão do React), comparando com a seleção anterior.
+  const [selecionadaAntes, setSelecionadaAntes] = useState(selecionada)
+  if (selecionada !== selecionadaAntes) {
+    setSelecionadaAntes(selecionada)
+    if (selecionada) {
+      setCentro({ lat: selecionada.lat, lon: selecionada.lon })
+      setZoom(z => Math.max(z, ZOOM_PRAIA))
+    }
+  }
 
   const medir = (e: LayoutChangeEvent) =>
     setTamanho({ largura: e.nativeEvent.layout.width, altura: e.nativeEvent.layout.height })

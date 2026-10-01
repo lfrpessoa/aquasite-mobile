@@ -16,7 +16,6 @@ const CHAVE = 'aquasite.sessao'
 export interface ResultadoEntrada {
   ok: boolean
   erro?: string
-  trocarSenha?: boolean
 }
 
 interface ValorAuth {
@@ -26,9 +25,6 @@ interface ValorAuth {
   ehAdmin: boolean
   /** true quando a última sessão terminou porque o token expirou */
   sessaoExpirada: boolean
-  /** entrou com senha temporária do admin: o app abre o Perfil pedindo uma senha nova */
-  trocarSenhaPendente: boolean
-  senhaTrocada: () => void
   entrar: (login: string, senha: string) => Promise<ResultadoEntrada>
   cadastrar: (dados: { username: string; email: string; password: string; bio?: string; avatar?: string | null }) => Promise<ResultadoEntrada>
   sair: () => Promise<void>
@@ -42,7 +38,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [sessao, setSessao] = useState<Sessao | null>(null)
   const [carregando, setCarregando] = useState(true)
   const [sessaoExpirada, setSessaoExpirada] = useState(false)
-  const [trocarSenhaPendente, setTrocarSenhaPendente] = useState(false)
 
   const guardar = useCallback(async (nova: Sessao | null) => {
     definirToken(nova?.token ?? null)
@@ -76,9 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const aplicar = useCallback(async (r: RespostaLogin): Promise<ResultadoEntrada> => {
     if (!r.success || !r.token || !r.user) return { ok: false, erro: r.error ?? 'Não foi possível entrar.' }
     setSessaoExpirada(false)
-    setTrocarSenhaPendente(r.trocarSenha === true)
     await guardar({ token: r.token, usuario: r.user })
-    return { ok: true, trocarSenha: r.trocarSenha === true }
+    return { ok: true }
   }, [guardar])
 
   const entrar = useCallback(async (login: string, senha: string) =>
@@ -88,12 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     aplicar(await contas.cadastrar(dados)), [aplicar])
 
   const sair = useCallback(async () => {
-    setTrocarSenhaPendente(false)
     if (sessao) await apagarCache(sessao.usuario.username)
     await removerAparelho() // antes de apagar o token: a API precisa saber de quem é o aparelho
     await guardar(null)
   }, [guardar, sessao])
-  const senhaTrocada = useCallback(() => setTrocarSenhaPendente(false), [])
 
   const atualizarConta = useCallback(async (username: string, token?: string) => {
     if (!sessao) return
@@ -102,8 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const valor = useMemo<ValorAuth>(() => ({
     carregando, sessao, usuario: sessao?.usuario ?? null, ehAdmin: sessao?.usuario.role === 'ADMIN',
-    sessaoExpirada, trocarSenhaPendente, senhaTrocada, entrar, cadastrar, sair, atualizarConta,
-  }), [carregando, sessao, sessaoExpirada, trocarSenhaPendente, senhaTrocada, entrar, cadastrar, sair, atualizarConta])
+    sessaoExpirada, entrar, cadastrar, sair, atualizarConta,
+  }), [carregando, sessao, sessaoExpirada, entrar, cadastrar, sair, atualizarConta])
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>
 }

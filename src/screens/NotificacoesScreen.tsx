@@ -10,6 +10,7 @@ import { usePresencaApp } from '../contexts/PresencaContext'
 import { useCarregar } from '../hooks/useCarregar'
 import { notificacoes } from '../services/api'
 import { tempoAtras } from '../utils/formatar'
+import { destinoDoAviso } from '../utils/destino'
 import type { Notificacao } from '../types/api'
 import type { RaizParams } from '../types/navegacao'
 import { base, cores, espaco, raio } from '../theme/tema'
@@ -25,11 +26,12 @@ const TIPOS: Record<string, { icone: NomeIcone; texto: string; cor: string }> = 
   comunidade: { icone: 'users', texto: 'respondeu seu pedido na Comunidade', cor: '#6d28d9' },
   'comunidade-pedido': { icone: 'users', texto: 'quer entrar na sua comunidade', cor: '#6d28d9' },
   'comunidade-aceito': { icone: 'check', texto: 'aceitou você na comunidade', cor: '#6d28d9' },
+  'comunidade-admin': { icone: 'users', texto: 'tornou você admin da comunidade', cor: '#6d28d9' },
   'moderacao-oculto': { icone: 'flag', texto: 'ocultou seu post do feed por denúncias. Um administrador vai revisar.', cor: '#c2410c' },
   'moderacao-liberado': { icone: 'check', texto: 'revisou seu post, que voltou ao feed.', cor: '#0d9488' },
 }
 
-const ehDoSistema = (n: Notificacao) => n.type.startsWith('moderacao')
+const ehDoSistema = (n: Notificacao) => n.type.startsWith('moderacao') || n.type === 'comunidade-admin'
 
 const NotificacoesScreen = ({ navigation }: Props) => {
   const eu = useEu()
@@ -43,8 +45,10 @@ const NotificacoesScreen = ({ navigation }: Props) => {
     else zerarNaoLidas()
   }, [lista.dados, eu.username, zerarNaoLidas])
 
+  // curtida, comentário e moderação abrem o post; mensagem abre a conversa; seguidor abre o perfil
   const abrir = (n: Notificacao) => {
-    if (n.type === 'message') navigation.navigate('Chat', { username: n.sender })
+    const destino = destinoDoAviso(n.type, n.post_id, n.sender)
+    if (destino) navigation.navigate(...destino)
     else if (n.type.startsWith('comunidade')) navigation.navigate('Abas', { screen: 'Comunidade' })
     else if (ehDoSistema(n)) navigation.navigate('Abas', { screen: 'Perfil' })
     else navigation.navigate('Usuario', { username: n.sender })
@@ -75,7 +79,7 @@ const NotificacoesScreen = ({ navigation }: Props) => {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={estilos.texto}><Text style={estilos.quem}>{quem}</Text> {t.texto}</Text>
-              {!!n.message && <Text style={estilos.trecho} numberOfLines={1}>"{n.message}"</Text>}
+              {!!n.message && <Text style={estilos.trecho} numberOfLines={1}>“{n.message}”</Text>}
             </View>
             <Text style={base.textoSuave}>{tempoAtras(n.created_at)}</Text>
           </Pressable>

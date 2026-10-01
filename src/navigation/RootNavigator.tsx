@@ -6,6 +6,7 @@ import AbasNavigator from './AbasNavigator'
 import EntrarScreen from '../screens/EntrarScreen'
 import UsuarioScreen from '../screens/UsuarioScreen'
 import ChatScreen from '../screens/ChatScreen'
+import PostScreen from '../screens/PostScreen'
 import NotificacoesScreen from '../screens/NotificacoesScreen'
 import BuscaScreen from '../screens/BuscaScreen'
 import FeedComunidadeScreen from '../screens/FeedComunidadeScreen'
@@ -18,6 +19,7 @@ import { Carregando } from '../components/Estados'
 import { useAuth } from '../contexts/AuthContext'
 import { aoTocarNoAviso, configurarPush, registrarAparelho } from '../services/push'
 import type { RaizParams } from '../types/navegacao'
+import { destinoDoAviso } from '../utils/destino'
 import { cores } from '../theme/tema'
 import { preferencias } from '../theme/cores'
 
@@ -38,13 +40,14 @@ const RootNavigator = () => {
   const { carregando, sessao } = useAuth()
   const logado = sessao?.usuario.username ?? null
 
-  // push: ao entrar, registra este aparelho na API; tocar num aviso abre a conversa ou as notificações
+  // push: ao entrar, registra este aparelho na API; tocar num aviso abre o que ele fala (post, conversa ou perfil)
   useEffect(() => {
     if (!logado) return
     void configurarPush().then(registrarAparelho)
     return aoTocarNoAviso(dados => {
       if (!navegacao.isReady()) return
-      if (dados.tipo === 'message' && dados.remetente) navegacao.navigate('Chat', { username: dados.remetente })
+      const destino = destinoDoAviso(dados.tipo, dados.postId, dados.remetente)
+      if (destino) navegacao.navigate(...destino)
       else navegacao.navigate('Notificacoes')
     })
   }, [logado])
@@ -64,6 +67,7 @@ const RootNavigator = () => {
             <Pilha.Screen name="Abas" component={AbasNavigator} options={{ headerShown: false }} />
             <Pilha.Screen name="Usuario" component={UsuarioScreen} options={{ title: 'Perfil' }} />
             <Pilha.Screen name="Chat" component={ChatScreen} options={{ title: 'Conversa' }} />
+            <Pilha.Screen name="Post" component={PostScreen} options={{ title: 'Post' }} />
             <Pilha.Screen name="Notificacoes" component={NotificacoesScreen} options={{ title: 'Notificações' }} />
             <Pilha.Screen name="Busca" component={BuscaScreen} options={{ title: 'Pesquisar' }} />
             <Pilha.Screen name="FeedComunidade" component={FeedComunidadeScreen} options={{ title: 'Feed' }} />

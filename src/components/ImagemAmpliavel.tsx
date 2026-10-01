@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Image, Modal, Pressable, StyleSheet, View } from 'react-native'
+import { Modal, Pressable, StyleSheet, View } from 'react-native'
+import { Image } from 'expo-image'
 import type { ImageStyle, StyleProp } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Icone from './Icone'
@@ -11,7 +12,10 @@ interface Props {
   estilo?: StyleProp<ImageStyle>
 }
 
-/** Foto de post ou mensagem: aparece cortada no feed e abre inteira ao tocar (igual ao site). */
+/**
+ * Foto de post, mensagem ou aviso: aparece cortada e abre inteira ao tocar (igual ao site).
+ * expo-image guarda a foto no disco do aparelho: ela não é baixada de novo e aparece mesmo sem conexão.
+ */
 const ImagemAmpliavel = ({ uri, descricao, estilo }: Props) => {
   const [aberta, setAberta] = useState(false)
   const margens = useSafeAreaInsets()
@@ -19,12 +23,12 @@ const ImagemAmpliavel = ({ uri, descricao, estilo }: Props) => {
     <>
       <Pressable onPress={() => setAberta(true)} accessibilityRole="imagebutton"
         accessibilityLabel={`${descricao}. Toque para ver inteira`}>
-        <Image source={{ uri }} style={estilo} resizeMode="cover" accessibilityIgnoresInvertColors />
+        <Image source={{ uri }} style={estilo} contentFit="cover" cachePolicy="memory-disk" transition={preferencias.menosMovimento ? 0 : 150} accessibilityIgnoresInvertColors />
       </Pressable>
       <Modal visible={aberta} transparent animationType={preferencias.menosMovimento ? 'none' : 'fade'} onRequestClose={() => setAberta(false)} statusBarTranslucent>
         <View style={estilos.fundo}>
           <Pressable style={StyleSheet.absoluteFill} onPress={() => setAberta(false)} accessibilityLabel="Fechar imagem" />
-          <Image source={{ uri }} style={estilos.imagem} resizeMode="contain" accessibilityLabel={descricao} />
+          <Image source={{ uri }} style={estilos.imagem} contentFit="contain" cachePolicy="memory-disk" accessibilityLabel={descricao} />
           <Pressable onPress={() => setAberta(false)} style={[estilos.fechar, { top: margens.top + 12 }]}
             accessibilityRole="button" accessibilityLabel="Fechar imagem" hitSlop={10}>
             <Icone nome="x" tamanho={22} cor="#fff" />

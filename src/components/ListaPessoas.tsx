@@ -24,18 +24,32 @@ interface Props {
 /** Lista de seguidores / seguindo de um perfil, com botão de seguir (como no site). */
 const ListaPessoas = ({ visivel, username, abaInicial, eu, aoFechar, aoAbrirPerfil }: Props) => {
   const [aba, setAba] = useState<Aba>(abaInicial)
-  const [pessoas, setPessoas] = useState<PessoaLista[] | null>(null)
-  const [erro, setErro] = useState<string | null>(null)
+  // quem abriu pediu outra aba (seguidores ou seguindo): ajusta durante a renderização, sem efeito extra
+  const [abaPedida, setAbaPedida] = useState<Aba>(abaInicial)
+  if (abaPedida !== abaInicial) {
+    setAbaPedida(abaInicial)
+    setAba(abaInicial)
+  }
 
-  useEffect(() => { setAba(abaInicial) }, [abaInicial])
+  // a lista guarda de qual perfil/aba ela é: ao trocar de aba, a antiga some na hora e mostra "carregando"
+  const chave = `${username}|${aba}`
+  const [lista, setLista] = useState<{ chave: string; pessoas: PessoaLista[] } | null>(null)
+  const [falha, setFalha] = useState<{ chave: string; erro: string } | null>(null)
+  const pessoas = lista?.chave === chave ? lista.pessoas : null
+  const erro = falha?.chave === chave ? falha.erro : null
+  const setPessoas = (mudar: (l: PessoaLista[] | null) => PessoaLista[] | null) =>
+    setLista(atual => (atual ? { ...atual, pessoas: mudar(atual.pessoas) ?? [] } : atual))
+  const setErro = (texto: string) => setFalha({ chave, erro: texto })
 
   useEffect(() => {
     if (!visivel) return
-    setPessoas(null)
-    setErro(null)
+    let vivo = true
     const busca = aba === 'seguidores' ? contas.seguidores(username) : contas.seguindo(username)
-    busca.then(setPessoas).catch(e => setErro(mensagemDeErro(e)))
-  }, [visivel, aba, username])
+    busca
+      .then(p => { if (vivo) { setLista({ chave, pessoas: p }); setFalha(null) } })
+      .catch(e => { if (vivo) setFalha({ chave, erro: mensagemDeErro(e) }) })
+    return () => { vivo = false }
+  }, [visivel, aba, username, chave])
 
   const alternarSeguir = async (p: PessoaLista) => {
     setPessoas(lista => lista?.map(x => x.username === p.username ? { ...x, euSigo: !x.euSigo } : x) ?? null)

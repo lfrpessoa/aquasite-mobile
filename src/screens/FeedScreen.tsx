@@ -70,6 +70,7 @@ const FeedScreen = ({ navigation }: Props) => {
   }, [eu.username])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- todo setState de carregar() vem depois do await da API
     void carregar()
     const id = setInterval(() => { void carregar(true) }, 15_000) // posts novos aparecem sozinhos
     return () => clearInterval(id)

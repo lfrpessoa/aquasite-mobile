@@ -7,9 +7,9 @@ import { contas } from '../services/api'
 import { mensagemDeErro } from '../services/http'
 import { cores, espaco, raio } from '../theme/tema'
 
-/** "Trocar senha" (PUT /api/users/senha). Abre sozinho quando a pessoa entrou com senha temporária. */
-const TrocarSenha = ({ obrigatoria, aoTrocar }: { obrigatoria: boolean; aoTrocar: () => void }) => {
-  const [aberto, setAberto] = useState(obrigatoria)
+/** "Trocar senha" (PUT /api/users/senha): informa a senha atual e escolhe uma nova. */
+const TrocarSenha = () => {
+  const [aberto, setAberto] = useState(false)
   const [atual, setAtual] = useState('')
   const [nova, setNova] = useState('')
   const [confirma, setConfirma] = useState('')
@@ -24,7 +24,6 @@ const TrocarSenha = ({ obrigatoria, aoTrocar }: { obrigatoria: boolean; aoTrocar
       if (r.success) {
         setMsg({ tipo: 'ok', texto: 'Senha alterada. Use a nova senha no próximo login.' })
         setAtual(''); setNova(''); setConfirma('')
-        aoTrocar()
       } else setMsg({ tipo: 'erro', texto: r.error ?? 'Não foi possível trocar a senha.' })
     } catch (e) {
       setMsg({ tipo: 'erro', texto: mensagemDeErro(e) })
@@ -35,18 +34,17 @@ const TrocarSenha = ({ obrigatoria, aoTrocar }: { obrigatoria: boolean; aoTrocar
   return (
     <View style={estilos.cartao}>
       <Text style={estilos.titulo}>Senha</Text>
-      {obrigatoria && <Aviso tipo="atencao" texto="Você entrou com uma senha temporária. Escolha uma senha nova agora." />}
       {!aberto ? (
         <Botao titulo="Trocar senha" icone="lock" variante="secundario" pequeno onPress={() => setAberto(true)} estilo={{ alignSelf: 'flex-start' }} />
       ) : (
         <View style={{ gap: espaco.md }}>
-          <Campo rotulo={`Senha atual${obrigatoria ? ' (a temporária)' : ''}`} senha value={atual} onChangeText={setAtual} autoComplete="current-password" />
+          <Campo rotulo="Senha atual" senha value={atual} onChangeText={setAtual} autoComplete="current-password" />
           <Campo rotulo="Nova senha" senha value={nova} onChangeText={setNova} maxLength={16} autoComplete="new-password"
             dica="Entre 8 e 16 caracteres, com pelo menos uma letra e um número ou símbolo." />
           <Campo rotulo="Confirmar nova senha" senha value={confirma} onChangeText={setConfirma} maxLength={16} />
           <View style={{ flexDirection: 'row', gap: espaco.sm }}>
             <Botao titulo="Salvar nova senha" pequeno onPress={salvar} carregando={enviando} desativado={!atual || !nova} />
-            {!obrigatoria && <Botao titulo="Cancelar" pequeno variante="texto" onPress={() => { setAberto(false); setMsg(null) }} />}
+            <Botao titulo="Cancelar" pequeno variante="texto" onPress={() => { setAberto(false); setMsg(null) }} />
           </View>
         </View>
       )}

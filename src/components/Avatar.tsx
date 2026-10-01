@@ -1,5 +1,6 @@
 import React from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { Image } from 'expo-image'
 import { cores } from '../theme/tema'
 import { semArroba } from '../utils/formatar'
 
@@ -17,7 +18,7 @@ const Avatar = ({ username, url, tamanho = 44, online }: Props) => {
   return (
     <View style={{ width: tamanho, height: tamanho }} accessible accessibilityLabel={`Foto de @${nome}${online ? ', online' : ''}`}>
       {url ? (
-        <Image source={{ uri: url }} style={[estilos.redondo, { width: tamanho, height: tamanho, borderRadius: tamanho / 2 }]} />
+        <Image source={{ uri: url }} cachePolicy="memory-disk" contentFit="cover" style={[estilos.redondo, { width: tamanho, height: tamanho, borderRadius: tamanho / 2 }]} />
       ) : (
         <View style={[estilos.redondo, estilos.semFoto, { width: tamanho, height: tamanho, borderRadius: tamanho / 2 }]}>
           <Text style={[estilos.inicial, { fontSize: tamanho * 0.42 }]}>{(nome[0] ?? '?').toUpperCase()}</Text>

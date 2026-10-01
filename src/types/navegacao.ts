@@ -5,6 +5,7 @@ import type { TipoGrupo } from './api'
 export type AbasParams = {
   Feed: undefined
   Mapa: undefined
+  Especies: undefined
   Comunidade: undefined
   Mensagens: undefined
   Perfil: undefined
@@ -18,6 +19,7 @@ export type RaizParams = {
   Abas: NavigatorScreenParams<AbasParams> | undefined
   Usuario: { username: string }
   Chat: { username: string }
+  Post: { id: number }
   Notificacoes: undefined
   Busca: undefined
   FeedComunidade: { tipo: TipoGrupo; id: number; nome: string }

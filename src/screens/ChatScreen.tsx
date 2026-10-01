@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ActionSheetIOS, Alert, FlatList, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActionSheetIOS, FlatList, Image, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { perguntar } from '../utils/perguntar'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Icone from '../components/Icone'
@@ -76,7 +77,7 @@ const ChatScreen = ({ route, navigation }: Props) => {
         { options: opcoes, destructiveButtonIndex: podeTodos ? 1 : 0, cancelButtonIndex: opcoes.length - 1 },
         i => { if (i === 0) void apagar(m, 'me'); else if (podeTodos && i === 1) void apagar(m, 'all') })
     } else {
-      Alert.alert('Apagar mensagem', undefined, [
+      perguntar('Apagar mensagem', undefined, [
         { text: 'Apagar para mim', onPress: () => void apagar(m, 'me') },
         ...(podeTodos ? [{ text: 'Apagar para todos', style: 'destructive' as const, onPress: () => void apagar(m, 'all') }] : []),
         { text: 'Cancelar', style: 'cancel' as const },

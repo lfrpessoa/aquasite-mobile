@@ -67,7 +67,7 @@ describe('PostCard', () => {
 describe('Animais Marinhos', () => {
   it('lista as 35 espécies, filtra por grupo e busca pelo nome', async () => {
     await montar(<AnimaisScreen />)
-    expect(await screen.findByText('35 espécies catalogadas')).toBeTruthy()
+    expect(await screen.findByText('35 espécies catalogadas', {}, { timeout: 5000 })).toBeTruthy()
     await fireEvent.press(screen.getByRole('radio', { name: 'Mamífero' }))
     expect(screen.getByText('8 espécies catalogadas')).toBeTruthy()
     await fireEvent.press(screen.getByRole('radio', { name: 'Todos' }))

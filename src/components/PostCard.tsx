@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react'
-import { Alert, Pressable, Share, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, Share, StyleSheet, Text, TextInput, View } from 'react-native'
+import { perguntar } from '../utils/perguntar'
 import Avatar from './Avatar'
 import Icone from './Icone'
 import ImagemAmpliavel from './ImagemAmpliavel'
@@ -15,13 +16,15 @@ interface Props {
   onComentar?: (post: Post, texto: string) => Promise<boolean>
   onApagar?: (post: Post) => void
   onAbrirPerfil?: (username: string) => void
+  /** abre já com os comentários à mostra (tela de detalhe do post) */
+  comentariosAbertos?: boolean
 }
 
 /** Um post do feed geral (mesmos dados e ações do site). */
-const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil }: Props) => {
+const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, comentariosAbertos: abertosDeInicio = false }: Props) => {
   const autor = semArroba(post.user)
   const meu = eu === autor
-  const [comentariosAbertos, setComentariosAbertos] = useState(false)
+  const [comentariosAbertos, setComentariosAbertos] = useState(abertosDeInicio)
   const [texto, setTexto] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [denunciar, setDenunciar] = useState(false)
@@ -33,7 +36,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil }: P
     } catch { /* a pessoa fechou a janela */ }
   }
 
-  const confirmarApagar = () => Alert.alert('Apagar post', 'Apagar este post? Não dá para desfazer.', [
+  const confirmarApagar = () => perguntar('Apagar post', 'Apagar este post? Não dá para desfazer.', [
     { text: 'Cancelar', style: 'cancel' },
     { text: 'Apagar', style: 'destructive', onPress: () => onApagar?.(post) },
   ])

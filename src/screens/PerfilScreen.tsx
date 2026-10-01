@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
-import { Alert, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { perguntar } from '../utils/perguntar'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import type { CompositeScreenProps } from '@react-navigation/native'
@@ -18,6 +19,7 @@ import { useAuth, useEu } from '../contexts/AuthContext'
 import { useCarregar } from '../hooks/useCarregar'
 import { contas, feed } from '../services/api'
 import { mensagemDeErro } from '../services/http'
+import { erroNoNome } from '../utils/nome'
 import { escolherImagem } from '../utils/imagem'
 import { calcularConquistas } from '../data/conteudo'
 import type { PerfilStats, Post } from '../types/api'
@@ -29,7 +31,7 @@ type Props = CompositeScreenProps<BottomTabScreenProps<AbasParams, 'Perfil'>, Na
 /** Meu perfil: os mesmos dados do /perfil do site (GET /api/users/{eu}/stats e /posts). */
 const PerfilScreen = ({ navigation }: Props) => {
   const eu = useEu()
-  const { ehAdmin, sair, atualizarConta, trocarSenhaPendente, senhaTrocada } = useAuth()
+  const { ehAdmin, sair, atualizarConta } = useAuth()
   const perfil = useCarregar<PerfilStats>(() => contas.perfil(eu.username), [eu.username])
   const posts = useCarregar<Post[]>(() => contas.postsDe(eu.username), [eu.username])
   const [erro, setErro] = useState<string | null>(null)
@@ -50,7 +52,7 @@ const PerfilScreen = ({ navigation }: Props) => {
         if (r.success) recarregar(); else setErro(r.error ?? 'Não foi possível trocar a foto.')
       } catch (e) { setErro(mensagemDeErro(e)) }
     }
-    Alert.alert('Foto de perfil', undefined, [
+    perguntar('Foto de perfil', undefined, [
       { text: 'Escolher da galeria', onPress: () => void usar('galeria') },
       { text: 'Tirar foto', onPress: () => void usar('camera') },
       ...(perfil.dados?.avatar ? [{
@@ -77,6 +79,8 @@ const PerfilScreen = ({ navigation }: Props) => {
       } else if (editando === 'nome') {
         const novo = valor.trim()
         if (novo === eu.username) { setEditando(null); setSalvando(false); return }
+        const problema = erroNoNome(novo)
+        if (problema) throw new Error(problema)
         const r = await contas.renomear(novo)
         if (!r.success || !r.newUsername) throw new Error(r.error ?? 'Não foi possível trocar o nome.')
         await atualizarConta(r.newUsername, r.token) // a API devolve um token novo com o nome novo
@@ -102,7 +106,7 @@ const PerfilScreen = ({ navigation }: Props) => {
     } catch (e) { setErro(mensagemDeErro(e)) }
   }
 
-  const confirmarSair = () => Alert.alert('Sair da conta', 'Deseja sair?', [
+  const confirmarSair = () => perguntar('Sair da conta', 'Deseja sair?', [
     { text: 'Cancelar', style: 'cancel' }, { text: 'Sair', style: 'destructive', onPress: () => void sair() },
   ])
 
@@ -117,7 +121,6 @@ const PerfilScreen = ({ navigation }: Props) => {
       <ScrollView contentContainerStyle={estilos.conteudo}
         refreshControl={<RefreshControl refreshing={false} onRefresh={recarregar} tintColor={cores.destaque} colors={[cores.destaque]} />}>
         <Aviso tipo="erro" texto={perfil.erro ?? erro} />
-        {trocarSenhaPendente && <TrocarSenha obrigatoria aoTrocar={senhaTrocada} />}
         {p && (
           <CabecalhoPerfil username={eu.username} perfil={p} aoTocarFoto={trocarFoto} aoTocarNome={() => abrirEdicao('nome')}
             aoAbrirLista={setLista}>
@@ -157,7 +160,7 @@ const PerfilScreen = ({ navigation }: Props) => {
             onAbrirPerfil={u => (u === eu.username ? undefined : navigation.navigate('Usuario', { username: u }))} />
         ))}
 
-        {!trocarSenhaPendente && <TrocarSenha obrigatoria={false} aoTrocar={senhaTrocada} />}
+        <TrocarSenha />
 
         <View style={base.cartao}>
           <Text style={base.tituloSecao}>Mais</Text>
@@ -178,10 +181,10 @@ const PerfilScreen = ({ navigation }: Props) => {
 
       <Folha visivel={editando !== null} titulo={editando === 'bio' ? 'Biografia' : 'Nome de usuário'} aoFechar={() => setEditando(null)}>
         {editando === 'nome' && (
-          <Text style={base.textoSuave}>O nome muda em todo o AquaSite: posts, mensagens, seguidores e comunidades.</Text>
+          <Text style={base.textoSuave}>O nome muda em todo o AquaSite: posts, mensagens, seguidores e comunidades. Use de 3 a 30 letras, números, ponto, hífen ou sublinhado.</Text>
         )}
         <Campo value={valor} onChangeText={setValor} multiline={editando === 'bio'} autoCapitalize={editando === 'nome' ? 'none' : 'sentences'}
-          maxLength={editando === 'bio' ? 300 : 50} rotulo={editando === 'bio' ? 'Conte um pouco sobre você' : 'Novo nome de usuário'} />
+          maxLength={editando === 'bio' ? 300 : 30} rotulo={editando === 'bio' ? 'Conte um pouco sobre você' : 'Novo nome de usuário'} />
         <Aviso tipo="erro" texto={erro} />
         <Botao titulo="Salvar" onPress={salvarEdicao} carregando={salvando} />
       </Folha>
