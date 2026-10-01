@@ -38,8 +38,10 @@ export async function escolherImagem(origem: 'galeria' | 'camera' = 'galeria', q
 export async function reduzirImagem(uri: string, largura: number, altura: number, ladoMaximo: number): Promise<string> {
   const contexto = ImageManipulator.manipulate(uri)
   if (Math.max(largura, altura) > ladoMaximo) {
-    if (largura >= altura) contexto.resize({ width: ladoMaximo, height: null })
-    else contexto.resize({ width: null, height: ladoMaximo })
+    // Passa as duas medidas já calculadas: na versão web, o expo-image-manipulator trata
+    // `null` como altura 0 e o navegador recusa ("The index is not in the allowed range").
+    const escala = ladoMaximo / Math.max(largura, altura)
+    contexto.resize({ width: Math.round(largura * escala), height: Math.round(altura * escala) })
   }
   const imagem = await contexto.renderAsync()
   const salva = await imagem.saveAsync({ format: SaveFormat.JPEG, compress: 0.7, base64: true })
