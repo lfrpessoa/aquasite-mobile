@@ -11,6 +11,7 @@ import PerfilScreen from '../screens/PerfilScreen'
 import type { AbasParams } from '../types/navegacao'
 import { cores } from '../theme/tema'
 import { preferencias } from '../theme/cores'
+import { useAuth } from '../contexts/AuthContext'
 
 const Abas = createBottomTabNavigator<AbasParams>()
 
@@ -20,9 +21,10 @@ const ICONES: Record<keyof AbasParams, NomeIcone> = {
 
 /** Abas de baixo, o jeito de navegar do celular (no site é o menu do topo). */
 const AbasNavigator = () => {
+  const { trocarSenhaPendente } = useAuth()
   return (
     <Abas.Navigator
-      initialRouteName="Feed"
+      initialRouteName={trocarSenhaPendente ? 'Perfil' : 'Feed'}
       screenOptions={({ route }) => ({
         headerShown: false,
         animation: preferencias.menosMovimento ? 'none' : 'shift',

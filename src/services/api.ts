@@ -9,7 +9,7 @@ import type {
   Conversa, EscopoApagar, Especie, FeedComunidade, Membro, Mensagem, MinhasSolicitacoes, NovaComunidade,
   NovaDenuncia, NovaEspecie, NovaOng, Notificacao, Ong, PerfilStats, PessoaLista, Post, RespostaComentarioComunidade,
   RespostaCurtida, RespostaCurtidaComunidade, RespostaDenuncia, RespostaLogin, RespostaParticipar, RespostaPedidos,
-  RespostaSimples, RespostaVisibilidade, ResultadoBusca, StatusDenuncia, StatusPedido,
+  RespostaSenhaTemporaria, RespostaSimples, RespostaVisibilidade, ResultadoBusca, StatusDenuncia, StatusPedido,
   TipoGrupo, Visibilidade, ComentarioPost,
 } from '../types/api'
 
@@ -166,6 +166,8 @@ export const admin = {
   usuarios: () => requisitar<AdminUsuario[]>('/api/admin/usuarios'),
   excluirUsuario: (username: string) =>
     requisitar<RespostaSimples>(`/api/admin/usuarios/${u(username)}`, { metodo: 'DELETE' }),
+  senhaTemporaria: (username: string) =>
+    requisitar<RespostaSenhaTemporaria>(`/api/admin/usuarios/${u(username)}/senha-temporaria`, { metodo: 'POST' }),
 
   posts: () => requisitar<AdminPost[]>('/api/admin/posts'),
   excluirPost: (id: number) => requisitar<RespostaSimples>(`/api/admin/posts/${id}`, { metodo: 'DELETE' }),

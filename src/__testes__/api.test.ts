@@ -102,10 +102,13 @@ describe('endpoints (os mesmos do site)', () => {
       'POST /api/comunidade/ong/3/participar', 'POST /api/comunidade/comunidade/9/pedidos/bia/aceitar'])
   })
 
-  it('admin: ocultar post', async () => {
+  it('admin: ocultar post e gerar senha temporária', async () => {
     await admin.ocultarPost(11, true)
     expect(chamadas[0].url).toBe(`${API_URL}/api/admin/posts/11/oculto`)
     expect(chamadas[0].init.method).toBe('PATCH')
     expect(JSON.parse(String(chamadas[0].init.body))).toEqual({ oculto: true })
+    await admin.senhaTemporaria('ana')
+    expect(chamadas[1].url).toBe(`${API_URL}/api/admin/usuarios/ana/senha-temporaria`)
+    expect(chamadas[1].init.method).toBe('POST')
   })
 })

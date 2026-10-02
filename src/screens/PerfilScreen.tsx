@@ -31,7 +31,7 @@ type Props = CompositeScreenProps<BottomTabScreenProps<AbasParams, 'Perfil'>, Na
 /** Meu perfil: os mesmos dados do /perfil do site (GET /api/users/{eu}/stats e /posts). */
 const PerfilScreen = ({ navigation }: Props) => {
   const eu = useEu()
-  const { ehAdmin, sair, atualizarConta } = useAuth()
+  const { ehAdmin, sair, atualizarConta, trocarSenhaPendente, senhaTrocada } = useAuth()
   const perfil = useCarregar<PerfilStats>(() => contas.perfil(eu.username), [eu.username])
   const posts = useCarregar<Post[]>(() => contas.postsDe(eu.username), [eu.username])
   const [erro, setErro] = useState<string | null>(null)
@@ -121,6 +121,7 @@ const PerfilScreen = ({ navigation }: Props) => {
       <ScrollView contentContainerStyle={estilos.conteudo}
         refreshControl={<RefreshControl refreshing={false} onRefresh={recarregar} tintColor={cores.destaque} colors={[cores.destaque]} />}>
         <Aviso tipo="erro" texto={perfil.erro ?? erro} />
+        {trocarSenhaPendente && <TrocarSenha obrigatoria aoTrocar={senhaTrocada} />}
         {p && (
           <CabecalhoPerfil username={eu.username} perfil={p} aoTocarFoto={trocarFoto} aoTocarNome={() => abrirEdicao('nome')}
             aoAbrirLista={setLista}>
@@ -160,7 +161,7 @@ const PerfilScreen = ({ navigation }: Props) => {
             onAbrirPerfil={u => (u === eu.username ? undefined : navigation.navigate('Usuario', { username: u }))} />
         ))}
 
-        <TrocarSenha />
+        {!trocarSenhaPendente && <TrocarSenha obrigatoria={false} aoTrocar={senhaTrocada} />}
 
         <View style={base.cartao}>
           <Text style={base.tituloSecao}>Mais</Text>

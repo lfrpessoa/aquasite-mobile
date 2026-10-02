@@ -21,6 +21,8 @@ export interface UsuarioSessao {
 
 export interface RespostaLogin extends RespostaSimples {
   token?: string
+  /** true quando a pessoa entrou com uma senha temporária gerada pelo admin */
+  trocarSenha?: boolean
   user?: UsuarioSessao
 }
 
@@ -365,3 +367,7 @@ export interface AdminDenuncia {
   created_at: string | null
 }
 
+
+export interface RespostaSenhaTemporaria extends RespostaSimples {
+  senhaTemporaria?: string
+}
