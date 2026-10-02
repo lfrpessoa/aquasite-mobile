@@ -11,7 +11,7 @@ import { cores, espaco } from '../theme/tema'
 
 type Props = CompositeScreenProps<BottomTabScreenProps<AbasParams, 'Especies'>, NativeStackScreenProps<RaizParams>>
 
-/** Aba "Espécies": o catálogo de animais marinhos (+ as cadastradas no admin) com atalho para Curiosidades. */
+/** Aba "Espécies": o catálogo de animais marinhos, com atalho para Curiosidades. */
 const EspeciesScreen = ({ navigation }: Props) => (
   <SafeAreaView style={estilos.tela} edges={['top']}>
     <View style={estilos.topo}>

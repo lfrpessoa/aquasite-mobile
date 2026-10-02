@@ -1,3 +1,6 @@
+import { reduzirImagem } from '../utils/imagem'
+
+// jest.mock é levado para o topo do arquivo pelo Jest, então vale mesmo vindo depois do import
 const mockResize = jest.fn()
 jest.mock('expo-image-picker', () => ({}))
 jest.mock('expo-image-manipulator', () => ({
@@ -9,8 +12,6 @@ jest.mock('expo-image-manipulator', () => ({
     }),
   },
 }))
-
-import { reduzirImagem } from '../utils/imagem'
 
 describe('reduzir imagem antes de enviar', () => {
   beforeEach(() => mockResize.mockClear())

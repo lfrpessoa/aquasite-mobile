@@ -61,18 +61,23 @@ const ComunidadeScreen = ({ navigation, route }: Props) => {
   const abrir = route.params?.abrir
   const [avisoLink, setAvisoLink] = useState<string | null>(null)
   useEffect(() => {
-    if (!abrir || !dados.dados) return
-    navigation.setParams({ abrir: undefined })
-    setAba(abrir.tipo === 'ong' ? 'ongs' : 'comunidades')
-    const achado = abrir.tipo === 'ong'
-      ? dados.dados.ongs.find(o => o.id === abrir.id)
-      : dados.dados.comunidades.find(c => c.id === abrir.id)
-    if (achado) {
-      setAvisoLink(null)
-      setAberto({ ...achado, tipo: abrir.tipo } as Item)
-    } else {
-      setAvisoLink(abrir.tipo === 'ong' ? 'A ONG do link não foi encontrada.' : 'A comunidade do link não foi encontrada. Ela pode ter sido removida.')
-    }
+    const listas = dados.dados
+    if (!abrir || !listas) return
+    // fora do corpo do efeito (no próximo ciclo), para não encadear renderizações
+    const t = setTimeout(() => {
+      navigation.setParams({ abrir: undefined })
+      setAba(abrir.tipo === 'ong' ? 'ongs' : 'comunidades')
+      const achado = abrir.tipo === 'ong'
+        ? listas.ongs.find(o => o.id === abrir.id)
+        : listas.comunidades.find(c => c.id === abrir.id)
+      if (achado) {
+        setAvisoLink(null)
+        setAberto({ ...achado, tipo: abrir.tipo } as Item)
+      } else {
+        setAvisoLink(abrir.tipo === 'ong' ? 'A ONG do link não foi encontrada.' : 'A comunidade do link não foi encontrada. Ela pode ter sido removida.')
+      }
+    }, 0)
+    return () => clearTimeout(t)
   }, [abrir, dados.dados, navigation])
 
   const atualizarItem = (novo: Item) => {

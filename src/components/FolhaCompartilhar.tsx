@@ -28,9 +28,10 @@ const FolhaCompartilhar = ({ alvo, aoFechar }: Props) => {
   const { usuario } = useAuth()
   const eu = usuario?.username ?? null
   const [pessoas, setPessoas] = useState<Pessoa[]>([])
-  const [carregando, setCarregando] = useState(false)
+  const [carregando, setCarregando] = useState(!!eu)
   const [termo, setTermo] = useState('')
-  const [encontradas, setEncontradas] = useState<Pessoa[] | null>(null)
+  // resultado da busca, guardado junto do termo buscado (só vale enquanto o termo for o mesmo)
+  const [resultado, setResultado] = useState<{ termo: string; pessoas: Pessoa[] } | null>(null)
   const [escolhidos, setEscolhidos] = useState<Pessoa[]>([])
   const [recado, setRecado] = useState('')
   const [copiado, setCopiado] = useState(false)
@@ -41,7 +42,6 @@ const FolhaCompartilhar = ({ alvo, aoFechar }: Props) => {
   useEffect(() => {
     if (!eu) return
     let ativo = true
-    setCarregando(true)
     void Promise.allSettled([mensagens.conversas(eu), contas.seguindo(eu)]).then(([c, s]) => {
       if (!ativo) return
       const lista: Pessoa[] = []
@@ -62,15 +62,17 @@ const FolhaCompartilhar = ({ alvo, aoFechar }: Props) => {
   // busca enquanto digita (espera a pessoa parar de digitar)
   useEffect(() => {
     const t = termo.trim()
-    if (!t) { setEncontradas(null); return }
+    if (!t) return
     const espera = setTimeout(() => {
       busca.pesquisar(t)
-        .then(r => setEncontradas(r.users.filter(x => x.username !== eu).map(x => ({ username: x.username, avatar: x.avatar ?? null }))))
-        .catch(() => setEncontradas([]))
+        .then(r => setResultado({ termo: t, pessoas: r.users.filter(x => x.username !== eu).map(x => ({ username: x.username, avatar: x.avatar ?? null })) }))
+        .catch(() => setResultado({ termo: t, pessoas: [] }))
     }, 300)
     return () => clearTimeout(espera)
   }, [termo, eu])
 
+  const termoAtual = termo.trim()
+  const encontradas = termoAtual && resultado?.termo === termoAtual ? resultado.pessoas : null
   const link = linkCompleto(alvo.caminho)
 
   const copiar = async () => {

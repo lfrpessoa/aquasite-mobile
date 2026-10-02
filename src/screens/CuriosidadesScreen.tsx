@@ -23,7 +23,6 @@ const CuriosidadesScreen = ({ navigation }: Props) => {
 
       <Pressable style={({ pressed }) => [estilos.animais, pressed && { opacity: 0.8 }]} onPress={() => navigation.navigate('Animais')}
         accessibilityRole="button" accessibilityLabel={`Animais marinhos: ${ANIMAIS.length} espécies. Abrir catálogo`}>
-        <Text style={estilos.animaisEmoji} accessible={false}>🐢🐬🐙</Text>
         <View style={{ flex: 1 }}>
           <Text style={estilos.dicaTitulo}>Animais marinhos</Text>
           <Text style={base.textoSuave}>{ANIMAIS.length} espécies em {GRUPOS.length} grupos, com curiosidades de cada uma</Text>
@@ -84,7 +83,6 @@ const estilos = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: espaco.md, padding: espaco.lg, borderRadius: raio.lg,
     backgroundColor: cores.destaqueFundo, borderWidth: 1, borderColor: 'rgba(0,212,255,0.35)',
   },
-  animaisEmoji: { fontSize: 26 },
 })
 
 export default CuriosidadesScreen
