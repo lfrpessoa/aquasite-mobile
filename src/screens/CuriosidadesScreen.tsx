@@ -3,6 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Folha from '../components/Folha'
 import Icone from '../components/Icone'
+import IconeAnimal from '../components/IconeAnimal'
 import { DICAS, POR_QUE_PRESERVAR } from '../data/conteudo'
 import type { Dica } from '../data/conteudo'
 import { ANIMAIS, GRUPOS } from '../data/animais'
@@ -23,6 +24,11 @@ const CuriosidadesScreen = ({ navigation }: Props) => {
 
       <Pressable style={({ pressed }) => [estilos.animais, pressed && { opacity: 0.8 }]} onPress={() => navigation.navigate('Animais')}
         accessibilityRole="button" accessibilityLabel={`Animais marinhos: ${ANIMAIS.length} espécies. Abrir catálogo`}>
+        <View style={estilos.animaisIcones}>
+          <IconeAnimal nome="tartaruga" tamanho={26} />
+          <IconeAnimal nome="golfinho" tamanho={26} />
+          <IconeAnimal nome="polvo" tamanho={26} />
+        </View>
         <View style={{ flex: 1 }}>
           <Text style={estilos.dicaTitulo}>Animais marinhos</Text>
           <Text style={base.textoSuave}>{ANIMAIS.length} espécies em {GRUPOS.length} grupos, com curiosidades de cada uma</Text>
@@ -63,6 +69,7 @@ const CuriosidadesScreen = ({ navigation }: Props) => {
 }
 
 const estilos = StyleSheet.create({
+  animaisIcones: { flexDirection: 'row', gap: 2 },
   conteudo: { padding: espaco.lg, gap: espaco.md, paddingBottom: espaco.xxl },
   capa: { backgroundColor: cores.fundo3, borderRadius: raio.lg + 4, padding: espaco.xl, gap: espaco.sm },
   titulo: { color: cores.destaque, fontSize: 28, fontWeight: '800' },

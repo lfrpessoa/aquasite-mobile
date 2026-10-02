@@ -3,6 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 import Chips from '../components/Chips'
 import Folha from '../components/Folha'
 import Icone from '../components/Icone'
+import IconeAnimal from '../components/IconeAnimal'
 import { EstadoVazio } from '../components/Estados'
 import { ANIMAIS, GRUPOS } from '../data/animais'
 import type { Animal } from '../data/animais'
@@ -44,6 +45,7 @@ const AnimaisScreen = () => {
         renderItem={({ item }) => (
           <Pressable style={({ pressed }) => [estilos.cartao, pressed && { opacity: 0.75 }]} onPress={() => setAberto(item)}
             accessibilityRole="button" accessibilityLabel={`${item.nome}, ${item.grupo}. Toque para ver a curiosidade`}>
+            <IconeAnimal nome={item.icone} tamanho={30} />
             <Text style={estilos.nome} numberOfLines={2}>{item.nome}</Text>
             <Text style={estilos.grupo}>{item.grupo}</Text>
           </Pressable>
@@ -53,6 +55,7 @@ const AnimaisScreen = () => {
       <Folha visivel={aberto !== null} aoFechar={() => setAberto(null)} titulo={aberto?.nome ?? ''}>
         {aberto && (
           <View style={estilos.ficha}>
+            <IconeAnimal nome={aberto.icone} tamanho={60} />
             <Text style={estilos.selo}>{aberto.grupo.toUpperCase()}</Text>
             <View style={estilos.linhaInfo}>
               <Icone nome="waves" tamanho={16} cor={cores.destaque} />
