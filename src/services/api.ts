@@ -46,6 +46,9 @@ export const contas = {
     requisitar<RespostaSimples & { newUsername?: string; token?: string }>('/api/users/username', {
       metodo: 'PUT', corpo: { newUsername },
     }),
+  /** "Esqueci minha senha": manda por e-mail o link para criar uma senha nova (resposta igual exista a conta ou não). */
+  esqueciSenha: (login: string) =>
+    requisitar<RespostaSimples & { mensagem?: string }>('/api/users/esqueci-senha', { metodo: 'POST', corpo: { login }, autenticar: false }),
   trocarSenha: (atual: string, nova: string) =>
     requisitar<RespostaSimples>('/api/users/senha', { metodo: 'PUT', corpo: { atual, nova } }),
 

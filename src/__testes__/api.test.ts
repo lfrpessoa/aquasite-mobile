@@ -71,6 +71,14 @@ describe('cliente HTTP', () => {
 describe('endpoints (os mesmos do site)', () => {
   beforeEach(() => { definirToken('tk'); responder(200, { success: true }) })
 
+  it('esqueci minha senha: pede o link sem mandar o token de login', async () => {
+    await contas.esqueciSenha('marina.alves')
+    expect(chamadas[0].url).toBe(`${API_URL}/api/users/esqueci-senha`)
+    expect(chamadas[0].init.method).toBe('POST')
+    expect(JSON.parse(String(chamadas[0].init.body))).toEqual({ login: 'marina.alves' })
+    expect((chamadas[0].init.headers as Record<string, string>).Authorization).toBeUndefined()
+  })
+
   it('feed em páginas de 20, a partir do último post exibido', async () => {
     await feed.pagina()
     await feed.pagina(42)

@@ -7,6 +7,7 @@ import Botao from '../components/Botao'
 import Icone from '../components/Icone'
 import { Aviso } from '../components/Estados'
 import Aparencia from '../components/Aparencia'
+import EsqueciSenha from '../components/EsqueciSenha'
 import { useAuth } from '../contexts/AuthContext'
 import { mensagemDeErro } from '../services/http'
 import { escolherImagem } from '../utils/imagem'
@@ -28,7 +29,6 @@ const EntrarScreen = ({ navigation }: Props) => {
   const [foto, setFoto] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
-  const [ajudaSenha, setAjudaSenha] = useState(false)
   const [aparencia, setAparencia] = useState(false)
   const forca = forcaDaSenha(senha)
 
@@ -116,16 +116,7 @@ const EntrarScreen = ({ navigation }: Props) => {
             <Aviso tipo="erro" texto={erro} />
             <Botao titulo={modo === 'entrar' ? 'Entrar' : 'Criar conta'} onPress={enviar} carregando={enviando} />
 
-            {modo === 'entrar' && (
-              <>
-                <Botao titulo="Esqueci minha senha" variante="texto" pequeno onPress={() => setAjudaSenha(a => !a)} />
-                {ajudaSenha && (
-                  <Text style={estilos.ajuda}>
-                    Peça a um administrador do AquaSite uma senha temporária. Entre com ela e o app vai pedir para você escolher uma senha nova.
-                  </Text>
-                )}
-              </>
-            )}
+            {modo === 'entrar' && <EsqueciSenha />}
           </View>
 
           <Botao titulo={modo === 'entrar' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'} variante="secundario" onPress={trocarModo} />
@@ -164,7 +155,6 @@ const estilos = StyleSheet.create({
   barra: { height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' },
   barraCheia: { height: 4 },
   regra: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  ajuda: { color: cores.textoSuave, fontSize: 13, lineHeight: 19, textAlign: 'center' },
   explorar: { alignItems: 'center', gap: 4, marginTop: espaco.sm },
   explorarTitulo: { color: cores.textoApagado, fontSize: 13 },
   explorarLinha: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
