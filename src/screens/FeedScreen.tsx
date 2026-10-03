@@ -6,6 +6,7 @@ import type { CompositeScreenProps } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import PostCard from '../components/PostCard'
 import PraiaProxima from '../components/PraiaProxima'
+import FilaStorys from '../components/story/FilaStorys'
 import Icone from '../components/Icone'
 import Botao from '../components/Botao'
 import { Aviso, EstadoVazio } from '../components/Estados'
@@ -36,6 +37,8 @@ const FeedScreen = ({ navigation }: Props) => {
   /** hora em que foi salvo o feed mostrado sem conexão (null = feed ao vivo da API) */
   const [offlineDesde, setOfflineDesde] = useState<number | null>(null)
   const curtindo = useRef(new Set<number>())
+  /** muda ao puxar para atualizar: a fila de storys também recarrega */
+  const [versaoStorys, setVersaoStorys] = useState(0)
 
   /** Primeira página; mantém os posts mais antigos que a pessoa já carregou (igual ao site). */
   const carregar = useCallback(async (silencioso = false) => {
@@ -137,6 +140,7 @@ const FeedScreen = ({ navigation }: Props) => {
 
   const cabecalho = (
     <View style={{ gap: espaco.md }}>
+      <FilaStorys eu={eu.username} aoAbrirPerfil={abrirPerfil} atualizar={versaoStorys} />
       <NovoPost aoPublicar={p => setPosts(atual => [p, ...atual])} />
       <PraiaProxima aoAbrirMapa={() => navigation.navigate('Mapa')} />
       {offlineDesde !== null && (
@@ -174,7 +178,7 @@ const FeedScreen = ({ navigation }: Props) => {
         onEndReached={carregarMais}
         onEndReachedThreshold={0.4}
         refreshControl={<RefreshControl refreshing={atualizando} tintColor={cores.destaque} colors={[cores.destaque]}
-          onRefresh={() => { setAtualizando(true); void carregar() }} />}
+          onRefresh={() => { setAtualizando(true); setVersaoStorys(v => v + 1); void carregar() }} />}
         contentContainerStyle={estilos.lista}
         ItemSeparatorComponent={() => <View style={{ height: espaco.md }} />}
       />

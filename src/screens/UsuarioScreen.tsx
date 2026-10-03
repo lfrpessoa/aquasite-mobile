@@ -7,6 +7,8 @@ import ListaPessoas from '../components/ListaPessoas'
 import ModalDenuncia from '../components/ModalDenuncia'
 import Botao from '../components/Botao'
 import { Aviso, Carregando, EstadoVazio } from '../components/Estados'
+import Destaques from '../components/story/Destaques'
+import GradePosts, { AbasPerfil } from '../components/story/GradePosts'
 import { useEu } from '../contexts/AuthContext'
 import { useCarregar } from '../hooks/useCarregar'
 import { contas, feed } from '../services/api'
@@ -17,7 +19,7 @@ import { base, cores, espaco } from '../theme/tema'
 
 type Props = NativeStackScreenProps<RaizParams, 'Usuario'>
 
-/** Perfil de outra pessoa: seguir, mandar mensagem, denunciar e ver os posts dela. */
+/** Perfil de outra pessoa: seguir, mandar mensagem, denunciar, ver os destaques e os posts dela (em grade ou lista). */
 const UsuarioScreen = ({ route, navigation }: Props) => {
   const { username } = route.params
   const eu = useEu()
@@ -27,6 +29,7 @@ const UsuarioScreen = ({ route, navigation }: Props) => {
   const [erro, setErro] = useState<string | null>(null)
   const [lista, setLista] = useState<'seguidores' | 'seguindo' | null>(null)
   const [denunciar, setDenunciar] = useState(false)
+  const [aba, setAba] = useState<'grade' | 'lista'>('grade')
 
   useEffect(() => {
     navigation.setOptions({ title: `@${username}` })
@@ -85,10 +88,15 @@ const UsuarioScreen = ({ route, navigation }: Props) => {
           </View>
         </CabecalhoPerfil>
       )}
-      <Text style={[base.tituloSecao, { marginTop: espaco.sm }]}>Posts</Text>
-      {posts.dados?.length === 0 && <Text style={base.textoSuave}>@{username} ainda não publicou nada.</Text>}
-      {posts.dados?.map(post => (
-        <PostCard key={post.id} post={post} eu={eu.username} onCurtir={curtir} onComentar={comentar}
+      <Destaques username={username} dono={false} aoAbrirPost={id => navigation.navigate('Post', { id })} />
+      <AbasPerfil aba={aba} aoMudar={setAba} />
+      {aba === 'grade' && (
+        <GradePosts posts={posts.dados ?? []} aoAbrir={post => navigation.navigate('Post', { id: post.id })}
+          vazio={`@${username} ainda não publicou nada.`} />
+      )}
+      {aba === 'lista' && posts.dados?.length === 0 && <Text style={base.textoSuave}>@{username} ainda não publicou nada.</Text>}
+      {aba === 'lista' && posts.dados?.map(post => (
+        <PostCard key={post.id} post={post} eu={eu.username} onCurtir={curtir} onComentar={comentar} noPerfil
           onAbrirPerfil={u => (u === username ? undefined : u === eu.username ? navigation.navigate('Abas', { screen: 'Perfil' }) : navigation.push('Usuario', { username: u }))} />
       ))}
 

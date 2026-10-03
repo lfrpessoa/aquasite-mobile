@@ -1,7 +1,7 @@
 import { forcaDaSenha } from '../utils/senha'
 import { diaSemana, duracao, numero, quandoPostou, semArroba, tempoAtras } from '../utils/formatar'
 import { PRAIAS, condicaoPorCodigo, distanciaKm, estadoDoMar, nivelUV, pontoCardeal, praiaMaisProxima } from '../utils/praias'
-import { calcularConquistas, temaLabel } from '../data/conteudo'
+import { temaLabel } from '../data/conteudo'
 import { ANIMAIS, GRUPOS } from '../data/animais'
 
 describe('força da senha (guia visual da regra RN02)', () => {
@@ -73,11 +73,6 @@ describe('praias', () => {
 })
 
 describe('conteúdo fixo', () => {
-  it('conquistas do perfil seguem as mesmas regras do site', () => {
-    const c = calcularConquistas(1, 3, 9)
-    expect(c.map(x => x.ganhou)).toEqual([true, false, true, false])
-    expect(calcularConquistas(5, 0, 10).filter(x => x.ganhou).map(x => x.nome)).toEqual(['Primeira publicação', 'Voz do oceano', 'Popular'])
-  })
   it('temas da comunidade', () => {
     expect(temaLabel('baleias-golfinhos')).toBe('Baleias e golfinhos')
     expect(temaLabel('inexistente')).toBe('inexistente')

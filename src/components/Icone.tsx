@@ -257,11 +257,78 @@ const ICONES = {
       <Polyline points="2 12 12 17 22 12" />
     </>
   ),
+  // Storys, destaques e grade do perfil (iguais aos do site)
+  plus: (
+    <>
+      <Line x1="12" y1="5" x2="12" y2="19" />
+      <Line x1="5" y1="12" x2="19" y2="12" />
+    </>
+  ),
+  grid: (
+    <>
+      <Rect x="3" y="3" width="7" height="7" />
+      <Rect x="14" y="3" width="7" height="7" />
+      <Rect x="3" y="14" width="7" height="7" />
+      <Rect x="14" y="14" width="7" height="7" />
+    </>
+  ),
+  list: (
+    <>
+      <Line x1="8" y1="6" x2="21" y2="6" />
+      <Line x1="8" y1="12" x2="21" y2="12" />
+      <Line x1="8" y1="18" x2="21" y2="18" />
+      <Circle cx="4" cy="6" r="1" />
+      <Circle cx="4" cy="12" r="1" />
+      <Circle cx="4" cy="18" r="1" />
+    </>
+  ),
+  pin: <Path d="M16 3l5 5-3 1-4 4 1 5-2 2-4-5-5 5-1-1 5-5-5-4 2-2 5 1 4-4z" />,
+  eye: (
+    <>
+      <Path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <Circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  image: (
+    <>
+      <Rect x="3" y="3" width="18" height="18" rx="2" />
+      <Circle cx="8.5" cy="8.5" r="1.5" />
+      <Polyline points="21 15 16 10 5 21" />
+    </>
+  ),
+  bookmark: <Path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />,
+  settings: (
+    <>
+      <Circle cx="12" cy="12" r="3" />
+      <Path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </>
+  ),
+  tartaruga: (
+    <>
+      <Path d="M5 12a6 5 0 1 0 12 0a6 5 0 1 0-12 0" />
+      <Path d="M17 11.5c1.5-1 3-1 4 .5-1 1.5-2.5 1.5-4 .5" />
+      <Path d="M7 8 4.5 5.5M7 16l-2.5 2.5M14 8l1.5-2.5M14 16l1.5 2.5" />
+    </>
+  ),
+  lampada: (
+    <>
+      <Path d="M9 18h6M10 21h4" />
+      <Path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.3 1 2.1h5c0-.8.4-1.6 1-2.1A6 6 0 0 0 12 3z" />
+    </>
+  ),
+  coral: (
+    <>
+      <Path d="M12 21v-7M12 14c0-3-3-3.5-3-6.5M12 14c0-2 3-2.5 3-5.5" />
+      <Path d="M9 7.5V5M15 8.5V6M6 21h12" />
+      <Path d="M9 11c-2 0-3-1.5-3-3.5M15 11.5c2 0 3-1.5 3-3.5" />
+    </>
+  ),
+  estrela: <Polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />,
 } satisfies Record<string, ReactElement>
 
 export type NomeIcone = keyof typeof ICONES
 
-export const NOMES_ICONES = ["acessibilidade","heart","message","trash","camera","user","users","bell","mail","flag","pencil","save","x","check","alert","menu","arrow-left","arrow-right","chevron-up","chevron-down","file","fish","waves","thermometer","sun","moon","cloud","cloud-drizzle","cloud-rain","cloud-lightning","wind","map-pin","search","navigation","crosshair","sunrise","sunset","droplet","globe","lock","layers","share","link","copy"] as const
+export const NOMES_ICONES = ["acessibilidade","heart","message","trash","camera","user","users","bell","mail","flag","pencil","save","x","check","alert","menu","arrow-left","arrow-right","chevron-up","chevron-down","file","fish","waves","thermometer","sun","moon","cloud","cloud-drizzle","cloud-rain","cloud-lightning","wind","map-pin","search","navigation","crosshair","sunrise","sunset","droplet","globe","lock","layers","share","link","copy","plus","grid","list","pin","eye","image","bookmark","settings","tartaruga","lampada","coral","estrela"] as const
 
 interface Props {
   nome: NomeIcone

@@ -10,7 +10,7 @@ import type {
   NovaDenuncia, NovaEspecie, NovaOng, Notificacao, Ong, PerfilStats, PessoaLista, Post, RespostaComentarioComunidade,
   RespostaCurtida, RespostaCurtidaComunidade, RespostaDenuncia, RespostaLogin, RespostaParticipar, RespostaPedidos,
   RespostaSenhaTemporaria, RespostaSimples, RespostaVisibilidade, ResultadoBusca, StatusDenuncia, StatusPedido,
-  TipoGrupo, Visibilidade, ComentarioPost,
+  TipoGrupo, Visibilidade, ComentarioPost, Destaque, GrupoStorys, NovoDestaque, PessoaQueViu, Story, TipoItemDestaque,
 } from '../types/api'
 
 const u = encodeURIComponent
@@ -199,3 +199,43 @@ export const admin = {
   excluirGrupo: (tipo: 'ongs' | 'comunidades', id: number) =>
     requisitar<RespostaSimples>(`/api/admin/${tipo}/${id}`, { metodo: 'DELETE' }),
 }
+
+// ---------- Storys e destaques (os mesmos endpoints do site) ----------
+
+/** A API responde 400/403 com { success: false, error }: aqui isso vira um erro com a mensagem dela. */
+async function exigirSucesso<T extends object>(promessa: Promise<T>): Promise<T> {
+  const r = await promessa
+  if (r && 'success' in r && (r as RespostaSimples).success === false) {
+    throw new ErroApi((r as RespostaSimples).error ?? 'Não foi possível concluir agora.', 400)
+  }
+  return r
+}
+
+export const storys = {
+  /** os storys no ar de quem eu sigo e os meus, agrupados por pessoa */
+  listar: () => requisitar<GrupoStorys[]>('/api/storys'),
+  /** quantos storys de quem eu sigo eu ainda não vi */
+  novos: () => requisitar<{ novos: number }>('/api/storys/novos'),
+  meus: () => requisitar<Story[]>('/api/storys/meus'),
+  /** imagem = data URL (já reduzida); texto opcional, até 150 caracteres */
+  publicar: async (imagem: string, texto: string) =>
+    (await exigirSucesso(requisitar<RespostaSimples & { story: Story }>('/api/storys', { metodo: 'POST', corpo: { imagem, texto } }))).story,
+  marcarVisto: (id: number) => requisitar<RespostaSimples>(`/api/storys/${id}/visto`, { metodo: 'POST' }),
+  quemViu: (id: number) =>
+    exigirSucesso(requisitar<RespostaSimples & { total: number; pessoas: PessoaQueViu[] }>(`/api/storys/${id}/visualizacoes`)),
+  apagar: (id: number) => exigirSucesso(requisitar<RespostaSimples>(`/api/storys/${id}`, { metodo: 'DELETE' })),
+}
+
+export const destaques = {
+  doPerfil: (username: string) => requisitar<Destaque[]>(`/api/users/${u(username)}/destaques`),
+  criar: (d: NovoDestaque) => exigirSucesso(requisitar<RespostaSimples & { id: number }>('/api/destaques', { metodo: 'POST', corpo: d })),
+  editar: (id: number, d: NovoDestaque) =>
+    exigirSucesso(requisitar<RespostaSimples>(`/api/destaques/${id}`, { metodo: 'PUT', corpo: d })),
+  apagar: (id: number) => exigirSucesso(requisitar<RespostaSimples>(`/api/destaques/${id}`, { metodo: 'DELETE' })),
+  adicionar: (id: number, tipo: TipoItemDestaque, alvoId: number) =>
+    exigirSucesso(requisitar<RespostaSimples>(`/api/destaques/${id}/itens`, { metodo: 'POST', corpo: { tipo, id: alvoId } })),
+}
+
+/** Fixar (ou desafixar) um post no topo do perfil. */
+export const fixarPost = (id: number, fixado: boolean) =>
+  exigirSucesso(requisitar<RespostaSimples>(`/api/posts/${id}/fixado`, { metodo: 'PUT', corpo: { fixado } }))

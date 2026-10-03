@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { perguntar } from '../utils/perguntar'
 import Avatar from './Avatar'
 import Icone from './Icone'
+import type { NomeIcone } from './Icone'
 import ImagemAmpliavel from './ImagemAmpliavel'
 import ModalDenuncia from './ModalDenuncia'
 import FolhaCompartilhar from './FolhaCompartilhar'
@@ -24,10 +25,14 @@ interface Props {
   comentariosAbertos?: boolean
   /** id do comentário que veio num link compartilhado (fica destacado) */
   comentarioDestacado?: number
+  /** botões a mais na linha de ações (no perfil: "Fixar" e "Destaque") */
+  extras?: React.ReactNode
+  /** no perfil: mostra "Fixado no perfil" no post fixado */
+  noPerfil?: boolean
 }
 
 /** Um post do feed geral (mesmos dados e ações do site). */
-const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, comentariosAbertos: abertosDeInicio = false, comentarioDestacado }: Props) => {
+const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, comentariosAbertos: abertosDeInicio = false, comentarioDestacado, extras, noPerfil = false }: Props) => {
   const autor = semArroba(post.user)
   const meu = eu === autor
   const [comentariosAbertos, setComentariosAbertos] = useState(abertosDeInicio)
@@ -57,7 +62,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
           <Avatar username={autor} tamanho={36} />
           <View>
             <Text style={estilos.nome}>@{autor}</Text>
-            <Text style={estilos.hora}>{quandoPostou(post)}</Text>
+            <Text style={estilos.hora}>{quandoPostou(post)}{noPerfil && post.fixado ? '  ·  fixado no perfil' : ''}</Text>
           </View>
         </Pressable>
         {meu && onApagar ? (
@@ -95,6 +100,7 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
           <Icone nome="share" tamanho={17} cor={cores.textoSuave} />
           <Text style={estilos.acaoTexto}>Compartilhar</Text>
         </Pressable>
+        {extras}
       </View>
 
       {comentariosAbertos && (
@@ -132,6 +138,14 @@ const PostCard = ({ post, eu, onCurtir, onComentar, onApagar, onAbrirPerfil, com
     </View>
   )
 }
+
+/** Botão no mesmo estilo das ações do post (usado em "extras": Fixar e Destaque no perfil). */
+export const AcaoPost = ({ icone, texto, onPress, ativo = false }: { icone: NomeIcone; texto: string; onPress: () => void; ativo?: boolean }) => (
+  <Pressable style={[estilos.acao, ativo && estilos.acaoCurtida]} onPress={onPress} accessibilityRole="button" accessibilityLabel={texto}>
+    <Icone nome={icone} tamanho={16} cor={ativo ? cores.destaque : cores.textoSuave} preenchimento={ativo && icone === 'pin' ? cores.destaque : 'none'} />
+    <Text style={[estilos.acaoTexto, ativo && { color: cores.destaque }]}>{texto}</Text>
+  </Pressable>
+)
 
 const estilos = StyleSheet.create({
   cartao: {

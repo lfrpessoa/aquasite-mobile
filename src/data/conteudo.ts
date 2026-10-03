@@ -43,23 +43,6 @@ export const motivoLabel = (v: string): string => MOTIVOS.find(m => m.valor === 
 export const localTexto = (item: { cidade?: string | null; uf?: string | null }): string =>
   [item.cidade, item.uf].filter(Boolean).join(' - ')
 
-/** Conquistas do perfil: calculadas com os dados da conta (não ficam no banco), como no site. */
-export interface Conquista {
-  icone: NomeIcone
-  nome: string
-  regra: string
-  ganhou: boolean
-}
-
-export function calcularConquistas(postsCount: number, followingCount: number, curtidasRecebidas: number): Conquista[] {
-  return [
-    { icone: 'fish', nome: 'Primeira publicação', regra: 'Publique 1 post', ganhou: postsCount >= 1 },
-    { icone: 'waves', nome: 'Voz do oceano', regra: 'Publique 5 posts', ganhou: postsCount >= 5 },
-    { icone: 'users', nome: 'Conectado', regra: 'Siga 3 pessoas', ganhou: followingCount >= 3 },
-    { icone: 'heart', nome: 'Popular', regra: 'Receba 10 curtidas', ganhou: curtidasRecebidas >= 10 },
-  ]
-}
-
 // ---------- Curiosidades ----------
 
 export const POR_QUE_PRESERVAR: { titulo: string; texto: string }[] = [

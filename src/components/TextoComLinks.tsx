@@ -22,6 +22,7 @@ interface Props {
 export function abrirLinkInterno(navigation: NativeStackNavigationProp<RaizParams>, l: LinkInterno) {
   if (l.tela === 'Post') navigation.navigate('Post', { id: l.id, comentarioId: l.comentarioId })
   else if (l.tela === 'FeedComunidade') navigation.navigate('FeedComunidade', { tipo: l.tipo, id: l.id, postId: l.postId, comentarioId: l.comentarioId })
+  else if (l.tela === 'Usuario') navigation.navigate('Usuario', { username: l.username })
   else navigation.navigate('Abas', { screen: 'Comunidade', params: { abrir: { tipo: l.tipo, id: l.id } } })
 }
 

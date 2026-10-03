@@ -32,6 +32,7 @@ export const caminhos = {
   postDoGrupo: (tipo: TipoGrupo, id: number, postId: number) => `${feedDoGrupo(tipo, id)}?post=${postId}`,
   comentarioDoGrupo: (tipo: TipoGrupo, id: number, postId: number, comentarioId: number) =>
     `${feedDoGrupo(tipo, id)}?post=${postId}&comentario=${comentarioId}`,
+  perfil: (username: string) => `/usuario/${encodeURIComponent(username)}`,
 }
 
 export const linkCompleto = (caminho: string) => `${SITE_URL}${caminho}`
@@ -71,6 +72,11 @@ export const alvos = {
     resumo: `Post de @${p.autor} em ${nomeDoGrupo(tipo, nome)}${p.conteudo ? `: "${trecho(p.conteudo)}"` : ''}`,
     caminho: caminhos.postDoGrupo(tipo, grupoId, p.id),
   }),
+  perfil: (username: string): AlvoCompartilhar => ({
+    titulo: `Perfil de @${semArroba(username)}`,
+    resumo: `Perfil de @${semArroba(username)} no AquaSite`,
+    caminho: caminhos.perfil(semArroba(username)),
+  }),
   comentarioDoGrupo: (tipo: TipoGrupo, grupoId: number, nome: string | undefined, postId: number, c: ComentarioComunidade): AlvoCompartilhar => ({
     titulo: `Comentário de @${c.autor}`,
     resumo: `Comentário de @${c.autor} em ${nomeDoGrupo(tipo, nome)}: "${trecho(c.texto)}"`,
@@ -87,6 +93,7 @@ export type LinkInterno =
   | { tela: 'Post'; id: number; comentarioId?: number; rotulo: string }
   | { tela: 'Grupo'; tipo: TipoGrupo; id: number; rotulo: string }
   | { tela: 'FeedComunidade'; tipo: TipoGrupo; id: number; postId?: number; comentarioId?: number; rotulo: string }
+  | { tela: 'Usuario'; username: string; rotulo: string }
 
 /** Se `url` for um link do AquaSite, diz qual tela abrir; senão, null. */
 export function lerLinkAquaSite(url: string): LinkInterno | null {
@@ -105,6 +112,7 @@ export function lerLinkAquaSite(url: string): LinkInterno | null {
     const comentarioId = numero(q.get('comentario'))
     return { tela: 'Post', id: Number(r[1]), comentarioId, rotulo: comentarioId ? 'Abrir comentário' : 'Abrir post' }
   }
+  if ((r = /^\/usuario\/([^/]+)$/.exec(caminho))) return { tela: 'Usuario', username: decodeURIComponent(r[1]), rotulo: 'Abrir perfil' }
   if (caminho === '/comunidade') {
     const ver = /^(ong|comunidade)-(\d+)$/.exec(q.get('ver') ?? '')
     if (!ver) return null

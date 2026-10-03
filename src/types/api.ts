@@ -73,6 +73,10 @@ export interface Post {
   /** data e hora completas (posts antigos não têm) */
   created_at?: string | null
   oculto?: boolean
+  /** fixado no topo do perfil do autor */
+  fixado?: boolean
+  /** a foto é um GIF (a grade do perfil mostra a etiqueta) */
+  gif?: boolean
   comments: ComentarioPost[]
 }
 
@@ -370,4 +374,62 @@ export interface AdminDenuncia {
 
 export interface RespostaSenhaTemporaria extends RespostaSimples {
   senhaTemporaria?: string
+}
+
+// ---------- Storys e destaques (/api/storys, /api/destaques) ----------
+
+export interface Story {
+  id: number
+  autor: string
+  /** URL da foto (/api/storys/{id}/imagem) */
+  imagem: string
+  texto: string | null
+  created_at: string
+  expira_em: string
+  /** quem está vendo já viu este story (os meus vêm sempre como vistos) */
+  visto: boolean
+  /** quantas pessoas viram: só vem nos meus storys */
+  visualizacoes?: number
+}
+
+/** Os storys de uma pessoa, como a API agrupa em GET /api/storys. */
+export interface GrupoStorys {
+  autor: string
+  avatar: string | null
+  meu: boolean
+  naoVistos: number
+  ultimo: string
+  storys: Story[]
+}
+
+export interface PessoaQueViu {
+  username: string
+  avatar: string | null
+  visto_em: string
+}
+
+export type TipoItemDestaque = 'story' | 'post'
+
+export interface ItemDestaque {
+  tipo: TipoItemDestaque
+  id: number
+  imagem: string | null
+  texto: string | null
+  created_at: string | null
+}
+
+export interface Destaque {
+  id: number
+  nome: string
+  /** um dos ícones de ICONES_DESTAQUE */
+  icone: string
+  /** foto do primeiro item que tem foto (sem foto, o app desenha o ícone) */
+  capa: string | null
+  itens: ItemDestaque[]
+}
+
+export interface NovoDestaque {
+  nome: string
+  icone: string
+  itens: { tipo: TipoItemDestaque; id: number }[]
 }
