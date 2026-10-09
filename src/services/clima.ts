@@ -19,7 +19,7 @@ export interface ClimaAtual {
   relative_humidity_2m: number
 }
 
-export interface ClimaDiario {
+interface ClimaDiario {
   time: string[]
   sunrise: string[]
   sunset: string[]

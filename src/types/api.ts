@@ -3,7 +3,7 @@
  * Os nomes dos campos seguem exatamente o JSON do backend Spring Boot.
  */
 
-export type Papel = 'USER' | 'ADMIN'
+type Papel = 'USER' | 'ADMIN'
 
 /** Resposta padrão de ações: { success: true, ... } ou { success: false, error }. */
 export interface RespostaSimples {
@@ -90,14 +90,14 @@ export interface RespostaCurtida {
 
 // ---------- Busca ----------
 
-export interface UsuarioBusca {
+interface UsuarioBusca {
   username: string
   bio: string | null
   avatar: string | null
   online?: boolean
 }
 
-export type PostBusca = Omit<Post, 'comments' | 'curtiu'>
+type PostBusca = Omit<Post, 'comments' | 'curtiu'>
 
 export interface ResultadoBusca {
   users: UsuarioBusca[]
@@ -130,7 +130,7 @@ export type EscopoApagar = 'me' | 'all'
 
 // ---------- Notificações ----------
 
-export type TipoNotificacao =
+type TipoNotificacao =
   | 'like' | 'comment' | 'follow' | 'message'
   | 'comunidade' | 'comunidade-pedido' | 'comunidade-aceito'
   | 'moderacao-oculto' | 'moderacao-liberado'
@@ -255,7 +255,7 @@ export interface RespostaVisibilidade extends RespostaSimples {
   pedidosAceitos?: number
 }
 
-export interface MinhaSolicitacao {
+interface MinhaSolicitacao {
   id: number
   nome: string
   status: StatusPedido

@@ -4,7 +4,7 @@ import type { NomeIcone } from '../components/Icone'
 import type { ClimaAtual, MarAtual } from '../services/clima'
 import { numero } from './formatar'
 
-export interface AlertaMar {
+interface AlertaMar {
   nivel: 'perigo' | 'atencao'
   icone: NomeIcone
   texto: string

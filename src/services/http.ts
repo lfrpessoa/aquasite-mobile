@@ -7,7 +7,7 @@ import { API_URL } from '../config/ambiente'
 
 type Metodo = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
-export interface OpcoesRequisicao {
+interface OpcoesRequisicao {
   metodo?: Metodo
   corpo?: unknown
   /** false = não mandar o token (login, cadastro e rotas públicas) */
@@ -36,7 +36,7 @@ export function aoSessaoExpirar(fn: (() => void) | null): void {
   aoExpirar = fn
 }
 
-export function urlDaApi(caminho: string): string {
+function urlDaApi(caminho: string): string {
   return `${API_URL}${caminho.startsWith('/') ? caminho : `/${caminho}`}`
 }
 

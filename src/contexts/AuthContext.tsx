@@ -13,7 +13,7 @@ import type { RespostaLogin, Sessao, UsuarioSessao } from '../types/api'
  */
 const CHAVE = 'aquasite.sessao'
 
-export interface ResultadoEntrada {
+interface ResultadoEntrada {
   ok: boolean
   erro?: string
   trocarSenha?: boolean

@@ -15,7 +15,7 @@ import type { RespostaSimples } from '../types/api'
 
 let tokenAtual: string | null = null
 
-export type ResultadoPush =
+type ResultadoPush =
   | { ok: true; token: string }
   | { ok: false; motivo: 'web' | 'sem-projeto' | 'sem-permissao' | 'erro'; detalhe?: string }
 
@@ -70,7 +70,7 @@ export async function removerAparelho(): Promise<void> {
   } catch { /* sem conexão: a API limpa o token quando a Expo avisar que ele não vale mais */ }
 }
 
-export interface DadosPush {
+interface DadosPush {
   tipo?: string
   postId?: number
   remetente?: string

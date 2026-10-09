@@ -2,8 +2,8 @@ import * as ImagePicker from 'expo-image-picker'
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator'
 
 /** Maior lado da foto enviada: posts e mensagens até 1080 px; foto de perfil até 512 px. */
-export const LADO_MAXIMO_POST = 1080
-export const LADO_MAXIMO_PERFIL = 512
+const LADO_MAXIMO_POST = 1080
+const LADO_MAXIMO_PERFIL = 512
 
 /**
  * Escolhe uma foto da galeria (ou tira com a câmera), reduz para no máximo `ladoMaximo` px e
@@ -49,8 +49,3 @@ export async function reduzirImagem(uri: string, largura: number, altura: number
   return `data:image/jpeg;base64,${salva.base64}`
 }
 
-/** Tamanho aproximado, em KB, de uma imagem em data URL (para mostrar ou conferir). */
-export function tamanhoKb(dataUrl: string): number {
-  const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1)
-  return Math.round((base64.length * 3) / 4 / 1024)
-}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as Location from 'expo-location'
 
-export type EstadoLocalizacao =
+type EstadoLocalizacao =
   | { estado: 'carregando' }
   | { estado: 'negado' }
   | { estado: 'erro' }

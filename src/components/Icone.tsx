@@ -328,7 +328,6 @@ const ICONES = {
 
 export type NomeIcone = keyof typeof ICONES
 
-export const NOMES_ICONES = ["acessibilidade","heart","message","trash","camera","user","users","bell","mail","flag","pencil","save","x","check","alert","menu","arrow-left","arrow-right","chevron-up","chevron-down","file","fish","waves","thermometer","sun","moon","cloud","cloud-drizzle","cloud-rain","cloud-lightning","wind","map-pin","search","navigation","crosshair","sunrise","sunset","droplet","globe","lock","layers","share","link","copy","plus","grid","list","pin","eye","image","bookmark","settings","tartaruga","lampada","coral","estrela"] as const
 
 interface Props {
   nome: NomeIcone

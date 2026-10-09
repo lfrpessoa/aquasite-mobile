@@ -4,7 +4,7 @@
  * `cores` é um objeto único que todas as telas leem ao carregar. O App aplica a paleta escolhida
  * ANTES de carregar as telas (ver App.tsx); trocar o tema salva a escolha e reinicia o app.
  */
-export interface Paleta {
+interface Paleta {
   fundo: string
   fundo2: string
   fundo3: string
@@ -80,7 +80,7 @@ export const cores: Paleta = { ...ESCURO }
 /** Preferências em uso (lidas pelas telas que precisam, ex.: animações e barra de status). */
 export const preferencias: Preferencias = { ...PREFERENCIAS_PADRAO }
 
-export function paletaPara(p: Preferencias): Paleta {
+function paletaPara(p: Preferencias): Paleta {
   if (p.tema === 'claro') return p.altoContraste ? CONTRASTE_CLARO : CLARO
   return p.altoContraste ? CONTRASTE_ESCURO : ESCURO
 }

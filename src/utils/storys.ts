@@ -40,7 +40,7 @@ export interface GrupoVisor {
   itens: ItemVisor[]
 }
 
-export const storyParaItem = (s: Story): ItemVisor => ({
+const storyParaItem = (s: Story): ItemVisor => ({
   tipo: 'story', id: s.id, imagem: s.imagem, texto: s.texto, created_at: s.created_at, visto: s.visto, visualizacoes: s.visualizacoes,
 })
 

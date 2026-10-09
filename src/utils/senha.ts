@@ -1,6 +1,6 @@
 // Guia visual da força da senha (a regra de verdade é conferida pelo servidor: 8 a 16 caracteres,
 // pelo menos uma letra e um número ou símbolo — RN02).
-export interface ForcaSenha {
+interface ForcaSenha {
   tamanhoOk: boolean
   temLetra: boolean
   temNumeroOuSimbolo: boolean

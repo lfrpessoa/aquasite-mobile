@@ -30,5 +30,4 @@ export const base = StyleSheet.create({
   },
   texto: { color: cores.texto, fontSize: fonte.normal, lineHeight: 22 },
   textoSuave: { color: cores.textoApagado, fontSize: 13 },
-  linha: { flexDirection: 'row', alignItems: 'center' },
 })

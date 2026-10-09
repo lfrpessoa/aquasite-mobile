@@ -10,7 +10,7 @@ const CHAVE_FEED = 'aquasite.cache.feed'
 const LIMITE_IMAGEM = 300_000   // fotos maiores que ~300 KB não entram na cópia
 const LIMITE_TOTAL = 2_000_000  // a cópia inteira fica abaixo de ~2 MB
 
-export interface FeedSalvo {
+interface FeedSalvo {
   posts: Post[]
   salvoEm: number
 }

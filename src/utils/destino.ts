@@ -1,7 +1,7 @@
 import type { RaizParams } from '../types/navegacao'
 
 /** Tela e parâmetros para onde levar a pessoa (formato aceito por navigation.navigate). */
-export type Destino =
+type Destino =
   | ['Post', RaizParams['Post']]
   | ['Chat', RaizParams['Chat']]
   | ['Usuario', RaizParams['Usuario']]

@@ -37,7 +37,7 @@ export const PRAIAS: Local[] = [
   { nome: 'Barra Grande', cidade: 'Maraú', uf: 'BA', lat: -14.2725, lon: -39.0125 },
 ]
 
-export interface InfoCategoria {
+interface InfoCategoria {
   valor: CategoriaAviso
   label: string
   icone: NomeIcone
@@ -75,7 +75,7 @@ export function praiaMaisProxima(lat: number, lon: number): { praia: Local; km: 
   return { praia: melhor, km: menor }
 }
 
-export interface Condicao {
+interface Condicao {
   texto: string
   icone: NomeIcone
 }

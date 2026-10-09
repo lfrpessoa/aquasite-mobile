@@ -3,7 +3,7 @@
 
 import type { IconeAnimalNome } from '../components/IconeAnimal'
 
-export type GrupoAnimal = 'Peixe' | 'Mamífero' | 'Molusco' | 'Crustáceo' | 'Réptil' | 'Cnidário' | 'Equinodermo'
+type GrupoAnimal = 'Peixe' | 'Mamífero' | 'Molusco' | 'Crustáceo' | 'Réptil' | 'Cnidário' | 'Equinodermo'
 
 export interface Animal {
   nome: string
