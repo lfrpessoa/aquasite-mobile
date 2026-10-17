@@ -72,7 +72,8 @@ const AcoesStory = ({ grupo, item, eu, controle, aoApagar, aoAbrirPerfil }: Prop
     const texto = resposta.trim()
     if (!texto) return
     try {
-      await mensagens.enviar(grupo.chave, `Respondeu ao seu story: "${texto}"`, null)
+      // vai com o id do story: no chat aparece a miniatura dele acima do texto (como no Instagram)
+      await mensagens.enviar(grupo.chave, texto, null, item.id)
       setResposta('')
       setAviso(`Resposta enviada para @${grupo.chave}.`)
     } catch (e) { setAviso(mensagemDeErro(e)) }

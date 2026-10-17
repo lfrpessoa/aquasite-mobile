@@ -120,6 +120,9 @@ export interface Mensagem {
   receiver: string
   content: string | null
   image: string | null
+  /** resposta a um story: o id e a URL da foto dele (404 depois que o story sai do ar) */
+  storyId?: number | null
+  storyImagem?: string | null
   createdAt?: string
   created_at?: string
   isRead?: boolean

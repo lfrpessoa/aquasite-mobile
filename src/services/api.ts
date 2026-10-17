@@ -91,8 +91,9 @@ export const busca = {
 export const mensagens = {
   conversas: (eu: string) => requisitar<Conversa[]>(`/api/messages/conversations/${u(eu)}`),
   conversa: (eu: string, outro: string) => requisitar<Mensagem[]>(`/api/messages/${u(eu)}/${u(outro)}`),
-  enviar: (receiver: string, content: string, image: string | null) =>
-    requisitar<Mensagem>('/api/messages', { metodo: 'POST', corpo: { receiver, content, image } }),
+  /** storyId: resposta a um story (o chat mostra a miniatura dele acima do texto) */
+  enviar: (receiver: string, content: string, image: string | null, storyId?: number) =>
+    requisitar<Mensagem>('/api/messages', { metodo: 'POST', corpo: { receiver, content, image, storyId } }),
   apagar: (id: number, scope: EscopoApagar) =>
     requisitar<RespostaSimples>(`/api/messages/${id}?scope=${scope}`, { metodo: 'DELETE' }),
 }

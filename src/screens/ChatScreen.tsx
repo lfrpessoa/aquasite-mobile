@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Icone from '../components/Icone'
 import ImagemAmpliavel from '../components/ImagemAmpliavel'
 import TextoComLinks from '../components/TextoComLinks'
+import RespostaDeStory from '../components/story/RespostaDeStory'
 import { Aviso, Carregando } from '../components/Estados'
 import { useEu } from '../contexts/AuthContext'
 import { useCarregar } from '../hooks/useCarregar'
@@ -97,6 +98,8 @@ const ChatScreen = ({ route, navigation }: Props) => {
       <Pressable onLongPress={() => menu(m)} delayLongPress={350} style={[estilos.linha, minha ? estilos.direita : estilos.esquerda]}
         accessibilityLabel={`${minha ? 'Você' : `@${m.sender}`}: ${m.deletedForAll ? 'mensagem apagada' : m.content || 'imagem'}, ${quando}`}
         accessibilityHint="Segure para apagar">
+        <View style={[estilos.coluna, { alignItems: minha ? 'flex-end' : 'flex-start' }]}>
+        {!!m.storyImagem && !m.deletedForAll && <RespostaDeStory uri={m.storyImagem} minha={minha} outro={m.receiver} />}
         <View style={[estilos.bolha, minha ? estilos.minha : estilos.dele]}>
           {m.deletedForAll ? (
             <Text style={estilos.apagada}>{minha ? 'Você apagou esta mensagem' : 'Esta mensagem foi apagada'}</Text>
@@ -107,6 +110,7 @@ const ChatScreen = ({ route, navigation }: Props) => {
             </>
           )}
           <Text style={[estilos.hora, minha && { color: 'rgba(255,255,255,0.75)' }]}>{quando}</Text>
+        </View>
         </View>
       </Pressable>
     )
@@ -154,7 +158,8 @@ const estilos = StyleSheet.create({
   linha: { flexDirection: 'row' },
   direita: { justifyContent: 'flex-end' },
   esquerda: { justifyContent: 'flex-start' },
-  bolha: { maxWidth: '80%', borderRadius: raio.lg, paddingHorizontal: 12, paddingVertical: 8, gap: 4 },
+  coluna: { maxWidth: '80%' },
+  bolha: { maxWidth: '100%', borderRadius: raio.lg, paddingHorizontal: 12, paddingVertical: 8, gap: 4 },
   minha: { backgroundColor: cores.destaqueEscuro, borderBottomRightRadius: 4 },
   dele: { backgroundColor: cores.painelClaro, borderBottomLeftRadius: 4, borderWidth: 1, borderColor: cores.borda },
   texto: { color: cores.texto, fontSize: 15, lineHeight: 21 },
