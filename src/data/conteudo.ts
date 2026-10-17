@@ -92,6 +92,46 @@ export const DICAS: Dica[] = [
   },
 ]
 
+// ---------- Curiosidades: os mesmos blocos da página do site (paginas/curiosidades) ----------
+
+export const NUMEROS: { valor: string; texto: string }[] = [
+  { valor: '71%', texto: 'da superfície da Terra é coberta pelo oceano.' },
+  { valor: '~50%', texto: 'do oxigênio que respiramos vem do oceano, produzido principalmente pelo fitoplâncton.' },
+  { valor: '+7 mil km', texto: 'de litoral no Brasil, do Amapá ao Rio Grande do Sul.' },
+  { valor: '11 mi t', texto: 'de plástico chegam ao oceano todo ano, segundo estimativa do PNUMA (ONU).' },
+]
+
+export const AMEACAS: { titulo: string; icone: NomeIcone; texto: string }[] = [
+  { titulo: 'Poluição plástica', icone: 'trash', texto: 'O plástico leva centenas de anos para se decompor e se quebra em microplásticos, que entram na cadeia alimentar dos animais e chegam até nós.' },
+  { titulo: 'Pesca predatória', icone: 'fish', texto: 'Pescar mais rápido do que os peixes se reproduzem, e com redes que prendem outros animais por acidente, ameaça tubarões, tartarugas e golfinhos.' },
+  { titulo: 'Aquecimento do mar', icone: 'sun', texto: 'A água mais quente causa o branqueamento dos corais, e o gás carbônico absorvido deixa o mar mais ácido, o que enfraquece conchas e esqueletos.' },
+  { titulo: 'Derramamento de óleo', icone: 'alert', texto: 'O óleo cobre penas, pelos e praias inteiras. Em 2019, manchas de óleo atingiram mais de mil localidades do litoral brasileiro.' },
+  { titulo: 'Esgoto sem tratamento', icone: 'waves', texto: 'O esgoto despejado no mar leva bactérias e nutrientes em excesso, deixa praias impróprias para banho e reduz o oxigênio da água.' },
+]
+
+export const ECOSSISTEMAS: { titulo: string; icone: NomeIcone; texto: string }[] = [
+  { titulo: 'Manguezais', icone: 'tartaruga', texto: 'São o berçário do mar: peixes, caranguejos e camarões nascem e crescem entre as raízes. Também protegem a costa da erosão e guardam carbono.' },
+  { titulo: 'Recifes de coral', icone: 'coral', texto: 'Ocupam uma área pequena do oceano, mas abrigam cerca de um quarto das espécies marinhas. No Brasil, o destaque é o Banco dos Abrolhos, na Bahia.' },
+  { titulo: 'Costões rochosos', icone: 'waves', texto: 'Paredões de pedra batidos pelas ondas, cobertos de mexilhões, cracas, algas e ouriços. São comuns no litoral do Sudeste e do Sul.' },
+  { titulo: 'Praias e dunas', icone: 'sun', texto: 'São áreas de desova das tartarugas marinhas: cinco das sete espécies do mundo vêm ao litoral brasileiro.' },
+]
+
+export interface PerguntaQuiz {
+  pergunta: string
+  opcoes: string[]
+  /** índice da opção certa */
+  certa: number
+  explicacao: string
+}
+
+export const QUIZ: PerguntaQuiz[] = [
+  { pergunta: 'Em qual destes animais é o macho que engravida?', opcoes: ['Golfinho', 'Cavalo-marinho', 'Polvo'], certa: 1, explicacao: 'No cavalo-marinho, a fêmea deposita os ovos em uma bolsa do macho, que carrega os filhotes até o nascimento.' },
+  { pergunta: 'Quantos corações tem um polvo?', opcoes: ['Um', 'Dois', 'Três'], certa: 2, explicacao: 'O polvo tem três corações e sangue azul.' },
+  { pergunta: 'O coral é um…', opcoes: ['Animal', 'Planta', 'Tipo de rocha'], certa: 0, explicacao: 'O coral é um animal que vive em colônias, parente das águas-vivas e das anêmonas.' },
+  { pergunta: 'Qual é o maior peixe do mundo?', opcoes: ['Tubarão-branco', 'Baleia-azul', 'Tubarão-baleia'], certa: 2, explicacao: 'É o tubarão-baleia. A baleia-azul é maior, mas é um mamífero, não um peixe.' },
+  { pergunta: 'Quanto da superfície da Terra é coberta pelo oceano?', opcoes: ['Cerca de 30%', 'Cerca de 50%', 'Cerca de 70%'], certa: 2, explicacao: 'O oceano cobre cerca de 71% da superfície do planeta.' },
+]
+
 // ---------- Sobre ----------
 
 export const EQUIPE: { nome: string; papel: string; descricao: string }[] = [
