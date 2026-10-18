@@ -1,4 +1,5 @@
-// Catálogo "Animais Marinhos": as 35 espécies do app mobile original do grupo (conteúdo fixo, como Curiosidades).
+// Catálogo "Animais Marinhos": as 35 espécies do app mobile original do grupo.
+// A tela usa as espécies do banco (GET /api/especies); esta lista fica de reserva para quando a API não responde.
 // Correção em relação ao app antigo: a raia-manta é um peixe cartilaginoso, não um molusco.
 
 import type { IconeAnimalNome } from '../components/IconeAnimal'
@@ -54,3 +55,24 @@ export const ANIMAIS: Animal[] = [
   { nome: 'Pepino-do-Mar', grupo: 'Equinodermo', icone: 'pepino', profundidade: '0–10.900 m', curiosidade: 'Expele os próprios órgãos como defesa e depois os regenera.' },
   { nome: 'Ouriço-do-Mar', grupo: 'Equinodermo', icone: 'ourico', profundidade: '0–5.000 m', curiosidade: 'Algumas espécies vivem mais de 200 anos.' },
 ]
+
+// Palavra do nome (sem acento) → desenho. A ordem importa: "tubarão-baleia" é tubarão, não baleia.
+const ICONE_POR_NOME: [string, IconeAnimalNome][] = [
+  ['tubarao', 'tubarao'], ['raia', 'raia'], ['moreia', 'moreia'], ['cavalo', 'cavalo'], ['golfinho', 'golfinho'],
+  ['orca', 'baleia'], ['narval', 'narval'], ['baleia', 'baleia'], ['beluga', 'baleia'], ['foca', 'foca'], ['leao-marinho', 'foca'],
+  ['dugongo', 'dugongo'], ['peixe-boi', 'dugongo'], ['polvo', 'polvo'], ['lula', 'lula'], ['caranguejo', 'caranguejo'],
+  ['siri', 'caranguejo'], ['lagosta', 'lagosta'], ['camarao', 'camarao'], ['tartaruga', 'tartaruga'], ['agua-viva', 'agua-viva'],
+  ['anemona', 'anemona'], ['coral', 'coral'], ['estrela', 'estrela'], ['ourico', 'ourico'], ['pepino', 'pepino'],
+]
+
+const ICONE_POR_GRUPO: Record<string, IconeAnimalNome> = {
+  peixe: 'peixe', mamifero: 'baleia', molusco: 'polvo', crustaceo: 'caranguejo', reptil: 'tartaruga', cnidario: 'agua-viva', equinodermo: 'estrela',
+}
+
+const semAcento = (t: string) => t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+
+/** Escolhe o desenho de uma espécie cadastrada pelo admin: primeiro pelo nome, depois pela categoria. */
+export function iconeDaEspecie(nome: string, categoria?: string | null): IconeAnimalNome {
+  const n = semAcento(nome)
+  return ICONE_POR_NOME.find(([palavra]) => n.includes(palavra))?.[1] ?? ICONE_POR_GRUPO[semAcento(categoria ?? '')] ?? 'peixe'
+}

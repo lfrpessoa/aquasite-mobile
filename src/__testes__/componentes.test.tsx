@@ -8,8 +8,9 @@ import PostCard from '../components/PostCard'
 import AnimaisScreen from '../screens/AnimaisScreen'
 import type { Post } from '../types/api'
 
-// A página de animais também busca as espécies do banco: aqui a API é simulada, sem espécies.
-jest.mock('../services/api', () => ({ especies: { listar: jest.fn(async () => []) } }))
+// A página de animais busca as espécies do banco: aqui a API é simulada.
+const mockListarEspecies = jest.fn()
+jest.mock('../services/api', () => ({ especies: { listar: () => mockListarEspecies() } }))
 
 // No app, o SafeAreaProvider vem do App.tsx; nos testes, cada tela é montada dentro dele.
 const MEDIDAS = { frame: { x: 0, y: 0, width: 390, height: 844 }, insets: { top: 0, left: 0, right: 0, bottom: 0 } }
@@ -65,13 +66,32 @@ describe('PostCard', () => {
 })
 
 describe('Animais Marinhos', () => {
-  it('lista as 35 espécies, filtra por grupo e busca pelo nome', async () => {
+  const especie = (id: number, nome: string, categoria: string, nomeCientifico: string | null = null) =>
+    ({ id, nome, categoria, nomeCientifico, descricao: `Sobre ${nome}.`, habitat: 'Recifes', imagem: null })
+
+  it('lista as espécies cadastradas no banco, filtra por grupo, busca e abre a ficha', async () => {
+    mockListarEspecies.mockResolvedValue([
+      especie(1, 'Tartaruga-verde', 'Réptil', 'Chelonia mydas'),
+      especie(2, 'Tubarão-baleia', 'Peixe', 'Rhincodon typus'),
+      especie(3, 'Peixe-palhaço', 'Peixe'),
+    ])
+    await montar(<AnimaisScreen />)
+    expect(await screen.findByText('3 espécies catalogadas', {}, { timeout: 5000 })).toBeTruthy()
+    await fireEvent.press(screen.getByRole('radio', { name: 'Peixe' }))
+    expect(screen.getByText('2 espécies catalogadas')).toBeTruthy()
+    await fireEvent.press(screen.getByRole('radio', { name: 'Todos' }))
+    await fireEvent.changeText(screen.getByLabelText('Buscar animal pelo nome'), 'chelonia')
+    expect(screen.getByText('1 espécie catalogada')).toBeTruthy()
+    await fireEvent.press(screen.getByRole('button', { name: /Tartaruga-verde/ }))
+    expect(screen.getByText('Sobre Tartaruga-verde.')).toBeTruthy()
+  })
+
+  it('sem conexão com a API, mostra as 35 espécies de reserva e avisa', async () => {
+    mockListarEspecies.mockRejectedValue(new Error('sem rede'))
     await montar(<AnimaisScreen />)
     expect(await screen.findByText('35 espécies catalogadas', {}, { timeout: 5000 })).toBeTruthy()
+    expect(screen.getByText(/Sem conexão com o servidor/)).toBeTruthy()
     await fireEvent.press(screen.getByRole('radio', { name: 'Mamífero' }))
     expect(screen.getByText('8 espécies catalogadas')).toBeTruthy()
-    await fireEvent.press(screen.getByRole('radio', { name: 'Todos' }))
-    await fireEvent.changeText(screen.getByLabelText('Buscar animal pelo nome'), 'tubar')
-    expect(screen.getByText('3 espécies catalogadas')).toBeTruthy()
   })
 })
