@@ -9,6 +9,7 @@ import CabecalhoPerfil from '../components/CabecalhoPerfil'
 import PostCard, { AcaoPost } from '../components/PostCard'
 import ListaPessoas from '../components/ListaPessoas'
 import TrocarSenha from '../components/TrocarSenha'
+import ExcluirConta from '../components/ExcluirConta'
 import Aparencia from '../components/Aparencia'
 import Folha from '../components/Folha'
 import FolhaCompartilhar from '../components/FolhaCompartilhar'
@@ -220,6 +221,7 @@ const PerfilScreen = ({ navigation }: Props) => {
         <Botao titulo="Sobre o AquaSite" icone="users" variante="texto" onPress={() => irPara('Sobre')} estilo={estilos.link} />
         {ehAdmin && <Botao titulo="Painel de administração" icone="lock" variante="texto" onPress={() => irPara('Admin')} estilo={estilos.link} />}
         <Botao titulo="Sair da conta" variante="perigo" onPress={() => { setConfig(false); confirmarSair() }} />
+        <ExcluirConta aoExcluir={() => { setConfig(false); void sair(true) }} />
       </Folha>
 
       <Folha visivel={editando !== null} titulo={editando === 'bio' ? 'Biografia' : 'Nome de usuário'} aoFechar={() => setEditando(null)}>

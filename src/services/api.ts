@@ -51,6 +51,9 @@ export const contas = {
     requisitar<RespostaSimples & { mensagem?: string }>('/api/users/esqueci-senha', { metodo: 'POST', corpo: { login }, autenticar: false }),
   trocarSenha: (atual: string, nova: string) =>
     requisitar<RespostaSimples>('/api/users/senha', { metodo: 'PUT', corpo: { atual, nova } }),
+  /** Apaga a própria conta e tudo que é dela; pede a senha. */
+  excluirConta: (senha: string) =>
+    requisitar<RespostaSimples>('/api/users/excluir-conta', { metodo: 'POST', corpo: { senha } }),
 
   online: (username: string) => requisitar<void>(`/api/users/${u(username)}/heartbeat`, { metodo: 'POST' }),
 }

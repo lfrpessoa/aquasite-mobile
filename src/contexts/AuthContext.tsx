@@ -31,7 +31,8 @@ interface ValorAuth {
   senhaTrocada: () => void
   entrar: (login: string, senha: string) => Promise<ResultadoEntrada>
   cadastrar: (dados: { username: string; email: string; password: string; bio?: string; avatar?: string | null }) => Promise<ResultadoEntrada>
-  sair: () => Promise<void>
+  /** contaExcluida = a API já apagou a conta (e os celulares dela): só limpa o aparelho */
+  sair: (contaExcluida?: boolean) => Promise<void>
   /** depois de trocar o nome de usuário a API devolve um token novo */
   atualizarConta: (username: string, token?: string) => Promise<void>
 }
@@ -87,10 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const cadastrar = useCallback<ValorAuth['cadastrar']>(async (dados) =>
     aplicar(await contas.cadastrar(dados)), [aplicar])
 
-  const sair = useCallback(async () => {
+  const sair = useCallback(async (contaExcluida = false) => {
     setTrocarSenhaPendente(false)
     if (sessao) await apagarCache(sessao.usuario.username)
-    await removerAparelho() // antes de apagar o token: a API precisa saber de quem é o aparelho
+    if (!contaExcluida) await removerAparelho() // antes de apagar o token: a API precisa saber de quem é o aparelho
     await guardar(null)
   }, [guardar, sessao])
   const senhaTrocada = useCallback(() => setTrocarSenhaPendente(false), [])
