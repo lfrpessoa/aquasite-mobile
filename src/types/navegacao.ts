@@ -12,9 +12,9 @@ export type AbasParams = {
   Perfil: undefined
 }
 
-/** Todas as telas empilháveis (logado ou visitante). */
+/** Todas as telas empilháveis. */
 export type RaizParams = {
-  // visitante
+  // sem login
   Entrar: { sessaoExpirada?: boolean } | undefined
   // logado
   Abas: NavigatorScreenParams<AbasParams> | undefined
@@ -27,8 +27,7 @@ export type RaizParams = {
   /** nome falta quando a tela é aberta por um link; postId/comentarioId = post e comentário do link */
   FeedComunidade: { tipo: TipoGrupo; id: number; nome?: string; postId?: number; comentarioId?: number }
   Admin: undefined
-  // abertas para todos
-  MapaVisitante: undefined
+  // abertas pela engrenagem do Perfil e pela aba Espécies
   Curiosidades: undefined
   Animais: undefined
   Sobre: undefined

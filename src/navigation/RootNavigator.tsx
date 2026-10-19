@@ -11,7 +11,6 @@ import NotificacoesScreen from '../screens/NotificacoesScreen'
 import BuscaScreen from '../screens/BuscaScreen'
 import FeedComunidadeScreen from '../screens/FeedComunidadeScreen'
 import AdminScreen from '../screens/AdminScreen'
-import MapaScreen from '../screens/MapaScreen'
 import CuriosidadesScreen from '../screens/CuriosidadesScreen'
 import AnimaisScreen from '../screens/AnimaisScreen'
 import SobreScreen from '../screens/SobreScreen'
@@ -33,7 +32,7 @@ const tema: Theme = {
 }
 
 /**
- * Sem login: tela de entrada + páginas abertas (Mapa, Curiosidades, Sobre), como no site.
+ * Sem login: só a tela de entrada (cadastro, login e "Esqueci minha senha").
  * Com login: as abas + telas empilhadas (perfil de outra pessoa, chat, notificações...).
  */
 const RootNavigator = () => {
@@ -76,7 +75,6 @@ const RootNavigator = () => {
         ) : (
           <>
             <Pilha.Screen name="Entrar" component={EntrarScreen} options={{ headerShown: false }} />
-            <Pilha.Screen name="MapaVisitante" component={MapaScreen} options={{ title: 'Mapa' }} />
           </>
         )}
         <Pilha.Screen name="Curiosidades" component={CuriosidadesScreen} />

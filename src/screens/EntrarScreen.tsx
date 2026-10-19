@@ -1,24 +1,20 @@
 import React, { useState } from 'react'
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import Campo from '../components/Campo'
 import Botao from '../components/Botao'
 import Icone from '../components/Icone'
 import { Aviso } from '../components/Estados'
-import Aparencia from '../components/Aparencia'
 import EsqueciSenha from '../components/EsqueciSenha'
 import { useAuth } from '../contexts/AuthContext'
 import { mensagemDeErro } from '../services/http'
 import { escolherImagem } from '../utils/imagem'
 import { forcaDaSenha } from '../utils/senha'
-import type { RaizParams } from '../types/navegacao'
 import { cores, espaco, raio } from '../theme/tema'
 
-type Props = NativeStackScreenProps<RaizParams, 'Entrar'>
 
 /** Entrar ou criar conta — a mesma conta vale no site e no app (mesma API, mesmo banco). */
-const EntrarScreen = ({ navigation }: Props) => {
+const EntrarScreen = () => {
   const { entrar, cadastrar, sessaoExpirada } = useAuth()
   const [modo, setModo] = useState<'entrar' | 'cadastrar'>('entrar')
   const [login, setLogin] = useState('')
@@ -29,7 +25,6 @@ const EntrarScreen = ({ navigation }: Props) => {
   const [foto, setFoto] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
-  const [aparencia, setAparencia] = useState(false)
   const forca = forcaDaSenha(senha)
 
   const trocarModo = () => { setModo(m => (m === 'entrar' ? 'cadastrar' : 'entrar')); setErro(null); setSenha('') }
@@ -120,20 +115,8 @@ const EntrarScreen = ({ navigation }: Props) => {
           </View>
 
           <Botao titulo={modo === 'entrar' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar'} variante="secundario" onPress={trocarModo} />
-
-          <View style={estilos.explorar}>
-            <Text style={estilos.explorarTitulo}>Explorar sem entrar</Text>
-            <View style={estilos.explorarLinha}>
-              <Botao titulo="Mapa" icone="map-pin" pequeno variante="texto" onPress={() => navigation.navigate('MapaVisitante')} />
-              <Botao titulo="Animais" icone="fish" pequeno variante="texto" onPress={() => navigation.navigate('Animais')} />
-              <Botao titulo="Curiosidades" icone="waves" pequeno variante="texto" onPress={() => navigation.navigate('Curiosidades')} />
-              <Botao titulo="Sobre" icone="users" pequeno variante="texto" onPress={() => navigation.navigate('Sobre')} />
-              <Botao titulo="Aparência" icone="sun" pequeno variante="texto" onPress={() => setAparencia(true)} />
-            </View>
-          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      {aparencia && <Aparencia visivel={aparencia} aoFechar={() => setAparencia(false)} />}
     </SafeAreaView>
   )
 }
@@ -155,9 +138,6 @@ const estilos = StyleSheet.create({
   barra: { height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.1)', overflow: 'hidden' },
   barraCheia: { height: 4 },
   regra: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  explorar: { alignItems: 'center', gap: 4, marginTop: espaco.sm },
-  explorarTitulo: { color: cores.textoApagado, fontSize: 13 },
-  explorarLinha: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
 })
 
 export default EntrarScreen
